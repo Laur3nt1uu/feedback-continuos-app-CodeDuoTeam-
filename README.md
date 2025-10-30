@@ -7,14 +7,14 @@ Aceasta este o aplicație web pentru acordarea de feedback continuu la cursuri s
 - Studentul poate introduce codul și trimite feedback prin emoji (😊, ☹️, 😮, 😕).  
 - Feedback-ul este anonim și vizibil live pe dashboard-ul profesorului.  
 
-Aplicația este formată din **backend Node.js + Express + Sequelize + Socket.IO** și **frontend React SPA**.  
+Aplicația este formată din **backend Node.js + Socket.IO** și **frontend React SPA**.  
 Baza de date este PostgreSQL (sau MySQL).
 
 ---
 
 ## 2. Tehnologii folosite
-- **Frontend:** React.js, React Router, Axios, Chart.js  
-- **Backend:** Node.js, Express, Sequelize, Socket.IO  
+- **Frontend:** React.js, React Router, Chart.js  
+- **Backend:** Node.js, Socket.IO  
 - **Baza de date:** PostgreSQL / MySQL  
 - **Versionare:** Git 
 - **Deploy:** Vercel (frontend) + Render / Azure (backend)   
