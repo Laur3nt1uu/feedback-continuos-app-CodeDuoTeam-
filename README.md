@@ -7,18 +7,18 @@ Aceasta este o aplicație web pentru acordarea de feedback continuu la cursuri s
 - Studentul poate introduce codul și trimite feedback prin emoji (😊, ☹️, 😮, 😕).  
 - Feedback-ul este anonim și vizibil live pe dashboard-ul profesorului.  
 
-Aplicația este formată din **backend Node.js + Socket.IO** și **frontend React SPA**.  
-Baza de date este PostgreSQL (sau MySQL).
+Aplicația este formată din **backend Node.js** și **frontend React SPA**.  
+
 
 ---
 
 ## 2. Tehnologii folosite
-- **Frontend:** React.js, React Router, Chart.js  
-- **Backend:** Node.js, Socket.IO  
+- **Frontend:** React.js
+- **Backend:** Node.js 
 - **Baza de date:** PostgreSQL / MySQL  
 - **Versionare:** Git 
-- **Deploy:** Vercel (frontend) + Render / Azure (backend)   
-- **Inca ne gandim daca vom folosi toate aceste tehnologii**
+- **Deploy:** inca nu stim 
+- **Inca ne gandim ce tehnologii vom folosi**
 
 ---
 
@@ -41,20 +41,10 @@ Baza de date este PostgreSQL (sau MySQL).
 - Adăugăm README cu descriere, specificații și plan  
 - Punem codul pe GitHub  
 
-### Etapa 2 – Funcționalități principale
-- Profesorul poate crea activitate cu titlu, descriere și cod  
-- Studentul introduce codul și poate trimite feedback prin emoji  
-- Backend-ul primește și salvează feedback-ul în baza de date  
-- Frontend-ul afișează feedback-ul live prin Socket.IO  
-- Testăm local că totul funcționează  
 
-### Etapa 3 – Funcționalități suplimentare și optimizări
-- Feedback-ul se afișează și după încheierea activității  
-- Adăugăm grafice și listă pentru vizualizare mai ușoară  
-- Curățăm codul, adăugăm comentarii și facem verificări minimale  
-- Deploy online pe Vercel (frontend) și Render/Azure (backend) 
 
-**ETAPELE SUNT ORIENTATIVE SI NE AJUTA PE NOI SA NE DESFASURAM PROIECTUL INTR-O MANIERA ORGANIZATA SI TOTODATA SA INTELEGI SI DUMNEAVOASTRA PROCESUL PRIN CARE TRECEM**
+**ETAPELE SUNT ORIENTATIVE SI NE AJUTA PE NOI SA NE DESFASURAM PROIECTUL INTR-O MANIERA ORGANIZATA SI TOTODATA SA INTELEGETI SI DUMNEAVOASTRA PROCESUL PRIN CARE TRECEM**
+**VOM ADAUGA ETAPELE PE PARCURS**
 
 ## 5. Structura proiectului
 
