@@ -39,7 +39,7 @@ Aplicația este formată din **backend Node.js** și **frontend React SPA**.
 - **Backend:** facem modelele `Activity` și `Feedback`, creăm rutele principale (fără toate validările)  
 - **Frontend:** pagini SPA minimale – `StudentJoin`, `ActivityView`, `ProfessorDashboard`  
 - Adăugăm README cu descriere, specificații și plan  
-- Punem codul pe GitHub  
+- Punem proiectul pe GitHub  
 
 
 
