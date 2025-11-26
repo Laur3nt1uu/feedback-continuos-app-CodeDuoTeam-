@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-
-import api from './api'; 
+// 🛑 SCHIMBARE: Importăm clientul Axios securizat în loc de axios simplu
+import api from '../api'; 
 import { 
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
 } from 'recharts';
 
 
-
+// Nu mai avem nevoie de API_BASE_URL pentru că 'api' îl gestionează
 const API_URL_ACTIVITIES = '/activities';
 
 
@@ -26,15 +26,17 @@ const ProfessorPage = () => {
     const [loading, setLoading] = useState(false);
     const [initialLoad, setInitialLoad] = useState(true); 
 
-   
+    // Am mutat fetchFeedback și checkActiveActivity în useCallback pentru useEffect
+    // și pentru a le face disponibile la apel
     const fetchFeedback = useCallback(async (activityId) => {
         try {
-            
+            // 🛑 SCHIMBARE: Folosim 'api' (trimite token)
             const res = await api.get(`${API_URL_ACTIVITIES}/${activityId}/feedback`);
             setFeedbackData(res.data.details); 
         } catch (err) {
             console.error('Eroare la preluarea feedback-ului (Posibil token invalid):', err);
-           
+            // Putem adăuga aici o logică pentru a forța logout dacă tokenul e invalid 
+            // (deși interceptorul api.js ar trebui să se ocupe de 401/403)
         }
     }, []); 
     
@@ -43,7 +45,7 @@ const ProfessorPage = () => {
         try {
             setLoading(true);
             
-            
+            // 🛑 SCHIMBARE: Folosim 'api' (rutele active nu sunt protejate, dar folosim clientul consistent)
             const res = await api.get(`${API_URL_ACTIVITIES}/active`);
             
             setCurrentActivity(res.data); 
@@ -73,7 +75,7 @@ const ProfessorPage = () => {
         let interval;
         
         if (currentActivity) {
-          
+            // Polling la fiecare 5 secunde
             interval = setInterval(() => {
                 fetchFeedback(currentActivity.id);
             }, 5000); 
@@ -89,14 +91,14 @@ const ProfessorPage = () => {
         setError('');
         setLoading(true);
         try {
-            
+            // 🛑 SCHIMBARE CRUCIALĂ: Folosim 'api' (aici este esențial să trimitem tokenul!)
             const res = await api.post(API_URL_ACTIVITIES, { name, description: name, durationMinutes: duration });
             setCurrentActivity(res.data);
             setLoading(false);
             
             fetchFeedback(res.data.id); 
         } catch (err) {
-            
+            // Eroare 403/401 de la backend dacă tokenul a lipsit sau a fost invalid
             setError(err.response?.data?.message || 'Eroare la creare activitate. Asigură-te că ești logat ca profesor.');
             setLoading(false);
         }
@@ -159,7 +161,7 @@ const ProfessorPage = () => {
         <div style={{ padding: '20px' }}>
             <h2>Tablou de Bord (Profesor)</h2>
             <p>Cod de Acces: <strong style={{fontSize: '1.5em', color: '#8884d8'}}>{currentActivity.uniqueCode}</strong></p>
-            <p><small>Activitatea se încheie la: *{new Date(new Date(currentActivity.startTime).getTime() + currentActivity.durationMinutes * 60000).toLocaleTimeString()}*</small></p>
+            <p><small>Activitatea se încheie la: **{new Date(new Date(currentActivity.startTime).getTime() + currentActivity.durationMinutes * 60000).toLocaleTimeString()}**</small></p>
             
             <hr style={{ margin: '20px 0' }}/>
             
@@ -174,15 +176,15 @@ const ProfessorPage = () => {
                             <YAxis allowDecimals={false} />
                             <Tooltip />
                             <Legend />
-                            
+                            {/* Folosim Bar-uri separate pentru a aplica culorile REACTION_COLORS */}
                             {Object.keys(REACTION_COLORS).map(reactionType => (
                                 <Bar 
                                     key={reactionType} 
                                     dataKey="count" 
                                     fill={REACTION_COLORS[reactionType]} 
-                                    name={reactionType.charAt(0) + reactionType.slice(1).toLowerCase()} 
+                                    name={reactionType.charAt(0) + reactionType.slice(1).toLowerCase()} // Formatare nume: Smiley, Frowny, etc.
                                     data={chartData.filter(d => d.name === reactionType)}
-                                    isAnimationActive={false}
+                                    isAnimationActive={false} // Dezactivează animațiile pentru a nu perturba polling-ul
                                 />
                             ))}
                         </BarChart>
