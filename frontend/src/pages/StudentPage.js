@@ -9,7 +9,7 @@ const API_URL_FEEDBACK = `${API_BASE_URL}/feedback`;
 
 const StudentPage = () => {
   const [code, setCode] = useState('');
-  const [activity, setActivity] = useState(null); // Stochează ID-ul și numele activității
+  const [activity, setActivity] = useState(null); 
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   
@@ -20,7 +20,7 @@ const StudentPage = () => {
     setMessage('');
     try {
       const res = await axios.post(`${API_URL_FEEDBACK}/join`, { uniqueCode: code });
-      // Dacă codul e valid, trece în starea de feedback
+      
       setActivity(res.data);
     } catch (err) {
       setError(err.response?.data?.message || 'Eroare la accesare cod.');
@@ -36,7 +36,7 @@ const StudentPage = () => {
         reactionType: type 
       });
       setMessage(`Feedback ${type} trimis! Mulțumim.`);
-      setTimeout(() => setMessage(''), 1500); // Șterge mesajul după 1.5s
+      setTimeout(() => setMessage(''), 1500); 
     } catch (err) {
       setError(err.response?.data?.message || 'Eroare la trimitere feedback.');
     }
