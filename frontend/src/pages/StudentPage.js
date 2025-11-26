@@ -27,20 +27,22 @@ const StudentPage = () => {
   };
 
   const sendFeedback = async (type) => {
-    setMessage('');
-    
-    if (!activity || !activity.id) {
-        setError('Eroare: Activitatea nu este definită.');
-        return;
-    }
+    setMessage('');
+    
+    // 🛑 SCHIMBARE: Verifică dacă activityId (numele din răspunsul Backend) există
+    if (!activity || !activity.activityId) { 
+        setError('Eroare: Activitatea nu este definită.');
+        return;
+    }
 
-    try {
-      
-      await axios.post(API_URL_FEEDBACK, { 
-        activityId: activity.id, 
-        reactionType: type,
-        timestamp: new Date().toISOString(), 
-      });
+    try {
+      
+      await axios.post(API_URL_FEEDBACK, { 
+        // 🛑 SCHIMBARE: Folosește activityId, nu activity.id
+        activityId: activity.activityId, 
+        reactionType: type,
+        timestamp: new Date().toISOString(), 
+      });
 
       
       const emojiMap = { SMILEY: "😊", FROWNY: "😔", SURPRISED: "😮", CONFUSED: "🤔" };
