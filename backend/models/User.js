@@ -1,31 +1,47 @@
-import mongoose from 'mongoose';
+import { DataTypes } from 'sequelize';
+import { sequelize } from '../config/db.js'; 
 
-const userSchema = new mongoose.Schema({
+const User = sequelize.define('User', {
+    id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4, 
+        primaryKey: true,
+        allowNull: false,
+    },
+    
+    // name
     name: {
-        type: String,
-        required: [true, 'Vă rugăm adăugați un nume'],
+        type: DataTypes.STRING,
+        allowNull: false,
     },
+    
+    // email
     email: {
-        type: String,
-        required: [true, 'Vă rugăm adăugați o adresă de email'],
-        unique: true,
-        lowercase: true,
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true, 
+        validate: {
+            isEmail: true,
+        },
     },
+    
+    // password
     password: {
-        type: String,
-        required: [true, 'Vă rugăm adăugați o parolă'],
-        minlength: 6,
+        type: DataTypes.STRING,
+        allowNull: false,
     },
-   
+    
     role: {
-        type: String,
-        enum: ['Professor', 'Student'],
-        default: 'Student', 
+        type: DataTypes.ENUM('Professor', 'Student'), 
+        defaultValue: 'Student', 
+        allowNull: false,
     },
 }, {
-    timestamps: true,
+    tableName: 'Users', 
+    timestamps: true, 
 });
 
-const User = mongoose.model('User', userSchema);
+
+
 
 export default User;

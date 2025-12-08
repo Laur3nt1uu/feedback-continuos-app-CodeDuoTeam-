@@ -1,36 +1,49 @@
-import mongoose from 'mongoose';
+import { DataTypes } from 'sequelize';
+import { sequelize } from '../config/db.js';
 
-const activitySchema = mongoose.Schema({
-  name: { 
-        type: String, 
-        required: true 
+const Activity = sequelize.define('Activity', {
+    id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true,
+        allowNull: false,
     },
-  description: { 
-        type: String, 
-        required: true 
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false,
     },
- 
-    professor: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true,
-        ref: 'User', 
+    description: {
+        type: DataTypes.STRING,
+        allowNull: false,
     },
-  uniqueCode: { 
-        type: String, 
-        required: true, 
-        unique: true 
-    }, 
-  startTime: { 
-        type: Date, 
-        default: Date.now 
-    }, 
-  durationMinutes: { 
-        type: Number, 
-        required: true 
-    }, 
-}, { 
-    timestamps: true 
+    uniqueCode: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+    },
+    startTime: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+        allowNull: false,
+    },
+    durationMinutes: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+    // Foreign key to User (Professor)
+    professorId: {
+        type: DataTypes.UUID,
+        allowNull: false,
+        references: {
+            model: 'Users',
+            key: 'id',
+        },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+    },
+}, {
+    tableName: 'Activities',
+    timestamps: true,
 });
 
-
-export default mongoose.model('Activity', activitySchema);
+export default Activity;

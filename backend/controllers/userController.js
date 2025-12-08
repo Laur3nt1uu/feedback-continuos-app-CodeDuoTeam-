@@ -4,9 +4,8 @@ import jwt from 'jsonwebtoken';
 
 
 const generateToken = (id) => {
-    
     return jwt.sign({ id }, process.env.JWT_SECRET, {
-        expiresIn: '30d', 
+        expiresIn: '30d',
     });
 };
 
@@ -24,7 +23,7 @@ const registerUser = async (req, res) => {
     }
 
     
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ where: { email } });
 
     if (userExists) {
         res.status(400).json({ message: 'Utilizatorul cu această adresă de email există deja.' });
@@ -46,11 +45,11 @@ const registerUser = async (req, res) => {
 
     if (user) {
         res.status(201).json({
-            _id: user._id,
+            _id: user.id,
             name: user.name,
             email: user.email,
             role: user.role,
-            token: generateToken(user._id), 
+            token: generateToken(user.id),
         });
     } else {
         res.status(400).json({ message: 'Date de utilizator invalide.' });
@@ -66,16 +65,16 @@ const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
   
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ where: { email } });
 
     
     if (user && (await bcrypt.compare(password, user.password))) {
         res.json({
-            _id: user._id,
+            _id: user.id,
             name: user.name,
             email: user.email,
             role: user.role,
-            token: generateToken(user._id),
+            token: generateToken(user.id),
         });
     } else {
         res.status(401).json({ message: 'Credențiale invalide.' });
