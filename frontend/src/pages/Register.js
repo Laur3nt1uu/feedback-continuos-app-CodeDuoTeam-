@@ -1,29 +1,31 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion'; 
 import { useAuth } from '../AuthContext'; 
 
 const API_BASE_URL = process.env.REACT_APP_BASE_URL || 'http://localhost:5000/api'; 
 const API_URL_USERS = `${API_BASE_URL}/users`;
 
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1,
+            delayChildren: 0.2,
+        },
+    },
+};
 
-const formVariants = {
-    hidden: { opacity: 0, scale: 0.95 }, 
-    visible: { 
-        opacity: 1, 
-        scale: 1, 
-        transition: { 
-            delayChildren: 0.2, 
-            staggerChildren: 0.1 
-        } 
+const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+        y: 0,
+        opacity: 1,
+        transition: { type: 'spring', stiffness: 100 }
     }
 };
-const itemVariants = {
-    hidden: { y: 20, opacity: 0 }, 
-    visible: { y: 0, opacity: 1 }
-};
-
 
 const Register = () => {
     const [formData, setFormData] = useState({
@@ -35,8 +37,6 @@ const Register = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    
-    
     const { login } = useAuth() || {}; 
 
     const { name, email, password, role } = formData;
@@ -58,7 +58,6 @@ const Register = () => {
                 role
             });
 
-            
             if (login) {
                 login(res.data); 
             }
@@ -68,7 +67,6 @@ const Register = () => {
             } else {
                 navigate('/'); 
             }
-            
         } catch (err) {
             setError(err.response?.data?.message || 'Eroare la înregistrare. Încearcă din nou.');
         } finally {
@@ -77,106 +75,133 @@ const Register = () => {
     };
 
     return (
-        <motion.div 
-            className="auth-container" 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            style={{ textAlign: 'center', padding: '50px' }}
-        >
-            <h2>Înregistrare Cont</h2>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            
-            <motion.form 
-                onSubmit={onSubmit} 
-                variants={formVariants} 
-                initial="hidden"
-                animate="visible"
-                style={{ 
-                    maxWidth: '400px', 
-                    margin: '0 auto', 
-                    padding: '20px', 
-                    backgroundColor: '#f9f9f9', 
-                    borderRadius: '10px', 
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)' 
-                }}
+        <div className="auth-page">
+            <motion.div 
+                className="auth-container"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, type: 'spring' }}
             >
-                
-                <motion.input 
-                    variants={itemVariants}
-                    whileHover={{ scale: 1.01, boxShadow: '0 0 8px rgba(136, 132, 216, 0.4)' }}
-                    type="text" 
-                    placeholder="Nume" 
-                    name="name" 
-                    value={name} 
-                    onChange={onChange} 
-                    required 
-                    style={{ margin: '10px 0', padding: '12px', width: '100%', borderRadius: '5px', border: '1px solid #ccc', outline: 'none' }}
-                />
-                
-               
-                <motion.input 
-                    variants={itemVariants}
-                    whileHover={{ scale: 1.01, boxShadow: '0 0 8px rgba(136, 132, 216, 0.4)' }}
-                    type="email" 
-                    placeholder="Email" 
-                    name="email" 
-                    value={email} 
-                    onChange={onChange} 
-                    required 
-                    style={{ margin: '10px 0', padding: '12px', width: '100%', borderRadius: '5px', border: '1px solid #ccc', outline: 'none' }}
-                />
-                
-                
-                <motion.input 
-                    variants={itemVariants}
-                    whileHover={{ scale: 1.01, boxShadow: '0 0 8px rgba(136, 132, 216, 0.4)' }}
-                    type="password" 
-                    placeholder="Parolă (minim 6 caractere)" 
-                    name="password" 
-                    value={password} 
-                    onChange={onChange} 
-                    required 
-                    style={{ margin: '10px 0', padding: '12px', width: '100%', borderRadius: '5px', border: '1px solid #ccc', outline: 'none' }}
-                />
+                <div className="text-center mb-3">
+                    <motion.h1
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.1 }}
+                    >
+                        📝 Înregistrare Cont
+                    </motion.h1>
+                    <p className="auth-subtitle">Creează un cont nou pentru a continua</p>
+                </div>
 
-                
-                <motion.select
-                    variants={itemVariants}
-                    whileHover={{ scale: 1.01, boxShadow: '0 0 8px rgba(136, 132, 216, 0.4)' }}
-                    name="role"
-                    value={role}
-                    onChange={onChange}
-                    style={{ margin: '10px 0', padding: '12px', width: '100%', borderRadius: '5px', border: '1px solid #ccc', outline: 'none' }}
+                {error && (
+                    <motion.div 
+                        className="alert alert-danger"
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ type: 'spring' }}
+                    >
+                        {error}
+                    </motion.div>
+                )}
+
+                <motion.form 
+                    onSubmit={onSubmit}
+                    className="auth-form"
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
                 >
-                    <option value="Professor">Profesor</option>
-                    <option value="Student">Student (Test)</option>
-                </motion.select>
-                
-                
-                <motion.button 
-                    variants={itemVariants}
-                    whileHover={{ scale: 1.05, backgroundColor: '#6a66b2' }} 
-                    whileTap={{ scale: 0.95 }} 
-                    type="submit" 
-                    disabled={loading} 
-                    style={{ 
-                        padding: '12px 25px', 
-                        marginTop: '25px', 
-                        backgroundColor: loading ? '#b3b3b3' : '#8884d8', 
-                        color: 'white', 
-                        border: 'none', 
-                        borderRadius: '50px', 
-                        cursor: loading ? 'wait' : 'pointer', 
-                        fontWeight: 'bold',
-                        transition: 'background-color 0.2s', 
-                    }}
+                    <motion.div className="form-group" variants={itemVariants}>
+                        <label htmlFor="name">Nume Complet</label>
+                        <motion.input 
+                            id="name"
+                            type="text"
+                            name="name"
+                            value={name}
+                            onChange={onChange}
+                            placeholder="Introdu-ți numele"
+                            required
+                            whileFocus={{ scale: 1.02 }}
+                            transition={{ type: 'spring', stiffness: 300 }}
+                        />
+                    </motion.div>
+
+                    <motion.div className="form-group" variants={itemVariants}>
+                        <label htmlFor="email">Email Address</label>
+                        <motion.input 
+                            id="email"
+                            type="email"
+                            name="email"
+                            value={email}
+                            onChange={onChange}
+                            placeholder="Introdu-ți email-ul"
+                            required
+                            whileFocus={{ scale: 1.02 }}
+                            transition={{ type: 'spring', stiffness: 300 }}
+                        />
+                    </motion.div>
+
+                    <motion.div className="form-group" variants={itemVariants}>
+                        <label htmlFor="password">Parolă</label>
+                        <motion.input 
+                            id="password"
+                            type="password"
+                            name="password"
+                            value={password}
+                            onChange={onChange}
+                            placeholder="Minim 6 caractere"
+                            required
+                            whileFocus={{ scale: 1.02 }}
+                            transition={{ type: 'spring', stiffness: 300 }}
+                        />
+                    </motion.div>
+
+                    <motion.div className="form-group" variants={itemVariants}>
+                        <label htmlFor="role">Rol</label>
+                        <motion.select
+                            id="role"
+                            name="role"
+                            value={role}
+                            onChange={onChange}
+                            whileFocus={{ scale: 1.02 }}
+                            transition={{ type: 'spring', stiffness: 300 }}
+                        >
+                            <option value="Professor">👨‍🏫 Profesor</option>
+                            <option value="Student">🎓 Student (Test)</option>
+                        </motion.select>
+                    </motion.div>
+
+                    <motion.button 
+                        type="submit"
+                        disabled={loading}
+                        className="auth-button"
+                        variants={itemVariants}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        {loading ? (
+                            <motion.span
+                                animate={{ rotate: 360 }}
+                                transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+                            >
+                                ⏳ Se înregistrează...
+                            </motion.span>
+                        ) : (
+                            '✨ Înregistrează-te'
+                        )}
+                    </motion.button>
+                </motion.form>
+
+                <motion.div 
+                    className="auth-footer"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5 }}
                 >
-                    {loading ? 'Se înregistrează...' : 'Înregistrează-te'}
-                </motion.button>
-            </motion.form>
-            <p style={{ marginTop: '20px' }}>Ai deja cont? <a href="/login" style={{ color: '#8884d8', textDecoration: 'none', fontWeight: 'bold' }}>Autentifică-te aici</a></p>
-        </motion.div>
+                    <p>Ai deja cont? <Link to="/login">Autentifică-te aici</Link></p>
+                </motion.div>
+            </motion.div>
+        </div>
     );
 };
 

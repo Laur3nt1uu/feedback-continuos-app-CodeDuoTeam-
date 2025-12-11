@@ -1,25 +1,19 @@
-
 import React from 'react';
+import { motion } from 'framer-motion';
 
-const EmoticonButton = ({ emoji, type, onClick }) => (
-  
-  <button 
-    className={`emoticon-btn ${type.toLowerCase()}`} 
+const EmoticonButton = ({ emoji, type, onClick, label }) => (
+  <motion.button 
+    className="emoticon-btn"
     onClick={() => onClick(type)}
-    style={{ 
-        fontSize: '3rem', 
-        width: '150px', 
-        height: '150px', 
-        margin: '15px', 
-        borderRadius: '10px',
-        backgroundColor: '#f0f0f0',
-        cursor: 'pointer' 
-    }}
+    whileHover={{ scale: 1.1 }}
+    whileTap={{ scale: 0.95 }}
+    transition={{ type: 'spring', stiffness: 300 }}
   >
-    {emoji}
-    <br />
-    <small style={{fontSize: '0.8rem', fontWeight: 'bold'}}>{type}</small>
-  </button>
+    <div style={{ fontSize: '3rem', marginBottom: '8px' }}>
+      {emoji}
+    </div>
+    {label && <span style={{ fontSize: '0.75rem', fontWeight: 'bold', display: 'block' }}>{label}</span>}
+  </motion.button>
 );
 
 export default EmoticonButton;

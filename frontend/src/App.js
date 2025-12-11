@@ -1,140 +1,169 @@
 import React from 'react';
-// 🛑 AM ELIMINAT: import HomePage from './pages/HomePage';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, Navigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import ProfessorPage from './pages/ProfessorPage';
 import StudentPage from './pages/StudentPage';
 import Register from './pages/Register';
-import Login from './pages/Login';    
+import Login from './pages/Login';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';    
 import PrivateRoute from './PrivateRoute'; 
-import { useAuth } from './AuthContext'; // Ai nevoie de useAuth pentru logica de redirecționare
+import { useAuth } from './AuthContext';
 
 import './App.css'; 
 
-
-// --------------------------------------------------------------------------------------------------
-// 🛑 NOU: Componenta care înlocuiește HomePage.js
-// Aceasta afișează butoanele sau redirecționează dacă e logat.
 const RootLandingPage = () => {
     const { isAuthenticated, user } = useAuth();
     
-    // Dacă este logat ca Profesor, mergi automat la dashboard
     if (isAuthenticated && user.role === 'Professor') {
         return <Navigate to="/professor" replace />;
     }
 
-    // Dacă este logat, dar nu e Profesor (ex: Student), îl putem lăsa să aleagă sau îl putem redirecționa
-    // Aici păstrăm funcționalitatea originală a HomePage pentru utilizatorii neautentificați sau studenți.
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.2,
+                delayChildren: 0.3,
+            },
+        },
+    };
+
+    const itemVariants = {
+        hidden: { y: 20, opacity: 0 },
+        visible: {
+            y: 0,
+            opacity: 1,
+            transition: { type: 'spring', stiffness: 100 }
+        }
+    };
     
     return (
-        <div style={{ textAlign: 'center', marginTop: '100px' }}>
-            <h1>Sistem de Feedback Continuu</h1>
-            <p>Alege rolul pentru a începe:</p>
-            
-            <div style={{ margin: '30px' }}>
-                {/* Dacă nu e logat, îl trimitem la /login pentru Profesor */}
-                <Link to={isAuthenticated ? '/professor' : '/login'}> 
-                    <button style={{ padding: '15px 30px', margin: '10px', fontSize: '1.2em', backgroundColor: '#8884d8', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-                        👨‍🏫 Sunt Profesor
-                    </button>
-                </Link>
-                {/* Studentul nu necesită logare, deci merge direct la /student */}
-                <Link to="/student">
-                    <button style={{ padding: '15px 30px', margin: '10px', fontSize: '1.2em', backgroundColor: '#82ca9d', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-                        🎓 Sunt Student
-                    </button>
-                </Link>
-            </div>
+        <div className="landing-page">
+            <motion.div 
+                className="landing-container"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+            >
+                <motion.h1 variants={itemVariants}>
+                    📚 Feedback Continuu
+                </motion.h1>
+                <motion.p variants={itemVariants}>
+                    Sistem inteligent de feedback în timp real pentru studenți
+                </motion.p>
+                
+                <motion.div className="landing-buttons" variants={itemVariants}>
+                    <Link to={isAuthenticated ? '/professor' : '/login'}> 
+                        <motion.button 
+                            className="btn-professor"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            👨‍🏫 Sunt Profesor
+                        </motion.button>
+                    </Link>
+                    <Link to="/student">
+                        <motion.button 
+                            className="btn-student"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            🎓 Sunt Student
+                        </motion.button>
+                    </Link>
+                </motion.div>
+            </motion.div>
         </div>
     );
 };
-// --------------------------------------------------------------------------------------------------
-
 
 const AppHeader = () => {
-    // ... (AppHeader-ul tău rămâne neschimbat)
     const { isAuthenticated, user, logout } = useAuth();
-    const navigate = useNavigate();
+    const navigate = useNavigate();
 
-    const handleLogout = () => {
-        logout();
-        navigate('/login'); 
-    };
+    const handleLogout = () => {
+        logout();
+        navigate('/login'); 
+    };
 
-    return (
-        <header style={{ 
-            padding: '15px 30px', 
-            backgroundColor: '#8884d8', 
-            color: 'white', 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center' 
-        }}>
-            <Link to={isAuthenticated && user?.role === 'Professor' ? '/professor' : '/'} 
-                  style={{ color: 'white', textDecoration: 'none' }}>
-                <h1 style={{ margin: 0, fontSize: '1.5em' }}>Feedback Live 🎓</h1>
-            </Link>
+    return (
+        <header className="navbar">
+            <div className="navbar-content">
+                <Link to={isAuthenticated && user?.role === 'Professor' ? '/professor' : '/'} 
+                      className="navbar-brand">
+                    📊 FeedbackLive
+                </Link>
 
-            {isAuthenticated ? (
-              
-                <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                    <span>Salut, *{user?.name}* ({user?.role})</span>
-                    <button 
-                        onClick={handleLogout} 
-                        style={{ 
-                            padding: '8px 15px', 
-                            backgroundColor: '#ff5c5c', 
-                            color: 'white', 
-                            border: 'none', 
-                            borderRadius: '5px', 
-                            cursor: 'pointer' 
-                        }}
-                    >
-                        Logout
-                    </button>
-                </div>
-            ) : (
-                
-                <div>
-                    <Link to="/login" style={{ color: 'white', marginRight: '15px', textDecoration: 'none' }}>Login</Link>
-                    <Link to="/register" style={{ color: 'white', textDecoration: 'none' }}>Register</Link>
-                </div>
-            )}
-        </header>
-    );
+                {isAuthenticated ? (
+                    <div className="flex gap-2">
+                        <span style={{ fontSize: '0.95rem', color: 'var(--text-primary)' }}>
+                            👋 {user?.name} <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>({user?.role})</span>
+                        </span>
+                        <motion.button 
+                            onClick={handleLogout}
+                            className="btn-secondary"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            style={{ padding: '8px 16px', fontSize: '0.9rem' }}
+                        >
+                            🚪 Logout
+                        </motion.button>
+                    </div>
+                ) : (
+                    <div className="flex gap-2">
+                        <Link to="/login">
+                            <motion.button 
+                                className="btn-secondary"
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                style={{ padding: '8px 16px', fontSize: '0.9rem' }}
+                            >
+                                Login
+                            </motion.button>
+                        </Link>
+                        <Link to="/register">
+                            <motion.button 
+                                className="btn-primary"
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                style={{ padding: '8px 16px', fontSize: '0.9rem' }}
+                            >
+                                Register
+                            </motion.button>
+                        </Link>
+                    </div>
+                )}
+            </div>
+        </header>
+    );
 };
 
-
 function App() {
-  return (
-    <Router>
-      <div className="App">
-        <AppHeader /> 
-        
-        <main style={{ padding: '20px' }}>
-          <Routes>
-            
-            {/* 🛑 SCHIMBARE: Acum '/' încarcă componenta RootLandingPage */}
-            <Route path="/" element={<RootLandingPage />} />
-            
-            
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
-
-            
-            <Route path="/student" element={<StudentPage />} /> 
-            <Route path="/student/:uniqueCode" element={<StudentPage />} />
-            
-            
-            <Route element={<PrivateRoute requiredRole="Professor" />}>
-                
-                <Route path="/professor" element={<ProfessorPage />} />
-            </Route>
-
-          </Routes>
-        </main>
-      </div>
-    </Router>
-  );
+    return (
+        <Router>
+            <div className="App">
+                <AppHeader /> 
+                
+                <main>
+                    <Routes>
+                        <Route path="/" element={<RootLandingPage />} />
+                        <Route path="/register" element={<Register />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/forgot-password" element={<ForgotPassword />} />
+                        <Route path="/reset-password/:token" element={<ResetPassword />} />
+                        <Route path="/student" element={<StudentPage />} /> 
+                        <Route path="/student/:uniqueCode" element={<StudentPage />} />
+                        
+                        <Route element={<PrivateRoute requiredRole="Professor" />}>
+                            <Route path="/professor" element={<ProfessorPage />} />
+                        </Route>
+                    </Routes>
+                </main>
+            </div>
+        </Router>
+    );
 }
 
 export default App;
