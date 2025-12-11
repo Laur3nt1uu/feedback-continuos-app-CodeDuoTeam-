@@ -221,6 +221,40 @@ const forgotPassword = async (req, res) => {
 };
 
 /**
+ * @desc    Validare token de resetare
+ * @route   GET /api/users/reset-password/:token
+ * @access  Public
+ */
+const validateResetToken = async (req, res) => {
+    const { token } = req.params;
+
+    if (!token) {
+        res.status(400).json({ message: 'Token nu a fost furnizat.' });
+        return;
+    }
+
+    // Hash token din URL
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    // Căutare utilizator cu token valid și neexpired
+    const user = await User.findOne({
+        where: {
+            resetPasswordToken: hashedToken,
+            resetPasswordExpires: {
+                [Op.gt]: new Date(),
+            },
+        },
+    });
+
+    if (!user) {
+        res.status(400).json({ message: 'Token invalid sau expirat. Solicită un nou link de resetare.' });
+        return;
+    }
+
+    res.json({ message: 'Token valid.' });
+};
+
+/**
  * @desc    Resetare parolă cu token
  * @route   POST /api/users/reset-password/:token
  * @access  Public
@@ -276,5 +310,6 @@ export {
     registerUser,
     loginUser,
     forgotPassword,
+    validateResetToken,
     resetPassword,
 };

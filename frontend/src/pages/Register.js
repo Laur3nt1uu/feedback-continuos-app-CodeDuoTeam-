@@ -112,52 +112,48 @@ const Register = () => {
                     animate="visible"
                 >
                     <motion.div className="form-group" variants={itemVariants}>
-                        <label htmlFor="name">Nume Complet</label>
                         <motion.input 
                             id="name"
                             type="text"
                             name="name"
                             value={name}
                             onChange={onChange}
-                            placeholder="Introdu-ți numele"
                             required
                             whileFocus={{ scale: 1.02 }}
                             transition={{ type: 'spring', stiffness: 300 }}
                         />
+                        <label htmlFor="name">Nume Complet</label>
                     </motion.div>
 
                     <motion.div className="form-group" variants={itemVariants}>
-                        <label htmlFor="email">Email Address</label>
                         <motion.input 
                             id="email"
                             type="email"
                             name="email"
                             value={email}
                             onChange={onChange}
-                            placeholder="Introdu-ți email-ul"
                             required
                             whileFocus={{ scale: 1.02 }}
                             transition={{ type: 'spring', stiffness: 300 }}
                         />
+                        <label htmlFor="email">Email Address</label>
                     </motion.div>
 
                     <motion.div className="form-group" variants={itemVariants}>
-                        <label htmlFor="password">Parolă</label>
                         <motion.input 
                             id="password"
                             type="password"
                             name="password"
                             value={password}
                             onChange={onChange}
-                            placeholder="Minim 6 caractere"
                             required
                             whileFocus={{ scale: 1.02 }}
                             transition={{ type: 'spring', stiffness: 300 }}
                         />
+                        <label htmlFor="password">Parolă</label>
                     </motion.div>
 
                     <motion.div className="form-group" variants={itemVariants}>
-                        <label htmlFor="role">Rol</label>
                         <motion.select
                             id="role"
                             name="role"
@@ -167,8 +163,9 @@ const Register = () => {
                             transition={{ type: 'spring', stiffness: 300 }}
                         >
                             <option value="Professor">👨‍🏫 Profesor</option>
-                            <option value="Student">🎓 Student (Test)</option>
+                            <option value="Student">🎓 Student</option>
                         </motion.select>
+                        <label htmlFor="role">Rol</label>
                     </motion.div>
 
                     <motion.button 

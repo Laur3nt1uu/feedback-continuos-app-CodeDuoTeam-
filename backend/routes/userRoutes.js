@@ -5,6 +5,7 @@ import {
     loginUser,
     forgotPassword,
     resetPassword,
+    validateResetToken,
 } from '../controllers/userController.js';
 
 
@@ -15,6 +16,9 @@ router.post('/login', loginUser);
 
 // Forgot password - trimite email cu link de resetare
 router.post('/forgot-password', forgotPassword);
+
+// Validare token de resetare
+router.get('/reset-password/:token', validateResetToken);
 
 // Reset password cu token
 router.post('/reset-password/:token', resetPassword);

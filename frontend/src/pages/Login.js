@@ -109,33 +109,31 @@ const Login = () => {
                     animate="visible"
                 >
                     <motion.div className="form-group" variants={itemVariants}>
-                        <label htmlFor="email">Email Address</label>
                         <motion.input 
                             id="email"
                             type="email"
                             name="email"
                             value={email}
                             onChange={onChange}
-                            placeholder="Enter your email"
                             required
                             whileFocus={{ scale: 1.02 }}
                             transition={{ type: 'spring', stiffness: 300 }}
                         />
+                        <label htmlFor="email">Email Address</label>
                     </motion.div>
 
                     <motion.div className="form-group" variants={itemVariants}>
-                        <label htmlFor="password">Parolă</label>
                         <motion.input 
                             id="password"
                             type="password"
                             name="password"
                             value={password}
                             onChange={onChange}
-                            placeholder="Enter your password"
                             required
                             whileFocus={{ scale: 1.02 }}
                             transition={{ type: 'spring', stiffness: 300 }}
                         />
+                        <label htmlFor="password">Parolă</label>
                     </motion.div>
 
                     <motion.button 
