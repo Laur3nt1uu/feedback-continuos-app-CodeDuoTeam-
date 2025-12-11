@@ -32,10 +32,13 @@ const joinActivity = async (req, res) => {
     
     if (!uniqueCode) return res.status(400).json({ message: 'Codul unic este obligatoriu.' });
 
+    // Normalize input: trim whitespace and uppercase to avoid mismatches
+    const normalizedCode = uniqueCode.toString().trim().toUpperCase();
+    if (!normalizedCode) return res.status(400).json({ message: 'Codul unic este invalid.' });
     try {
         // 🛑 SCHIMBARE: Sequelize findOne cu obiectul 'where'
         const activity = await Activity.findOne({ 
-            where: { uniqueCode: uniqueCode.toUpperCase() } 
+            where: { uniqueCode: normalizedCode } 
         });
         
         if (!activity) {

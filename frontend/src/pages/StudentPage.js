@@ -39,7 +39,9 @@ const StudentPage = () => {
     setMessage('');
     setLoading(true);
     try {
-      const res = await axios.post(`${API_URL_FEEDBACK}/join`, { uniqueCode: code }); 
+      // Trim whitespace and ensure uppercase before sending to backend
+      const normalized = code.toString().trim().toUpperCase();
+      const res = await axios.post(`${API_URL_FEEDBACK}/join`, { uniqueCode: normalized }); 
       setActivity(res.data);
     } catch (err) {
       setError(err.response?.data?.message || 'Eroare la accesare cod. Verifică codul introdus!');
