@@ -1,19 +1,17 @@
 import Activity from '../models/Activity.js';
 import User from '../models/User.js'; 
 import Feedback from '../models/Feedback.js'; 
-import { Op, literal } from 'sequelize'; // Importă Operatorii și literal pentru SQL brut
+import { Op, literal } from 'sequelize';
 
-// Utilitar pentru a genera codul unic
 const generateUniqueCode = () => Math.random().toString(36).substring(2, 8).toUpperCase();
 
 
 /**
- * @desc    Creează o nouă activitate
- * @route   POST /api/activities
- * @access  Privat (Profesor)
+ * @desc    
+ * @route   
+ * @access  
  */
 const createActivity = async (req, res) => {
-    // În Sequelize, ID-ul utilizatorului este 'id', nu '_id'
     const professorId = req.user.id; 
     const { name, description, durationMinutes } = req.body;
 
@@ -24,13 +22,10 @@ const createActivity = async (req, res) => {
     try {
         const currentTime = new Date();
         
-        // 🛑 LOGICĂ CRITICĂ: Echivalentul $expr din MongoDB (endTime > currentTime)
-        // Calculăm timpul de sfârșit al activității stocate (startTime + durationMinutes)
         const existingActive = await Activity.findOne({
             where: {
                 professorId: professorId,
-                // Utilizăm Sequelize.literal pentru a calcula timpul de sfârșit direct în SQL:
-                // "startTime" + (durationMinutes * 60000 milisecunde) > Timpul Curent
+              
                 [Op.and]: [
                     literal(`"startTime" + ("durationMinutes" * interval '1 minute') > NOW()`)
                 ]
@@ -41,15 +36,13 @@ const createActivity = async (req, res) => {
             return res.status(400).json({ message: `Ai deja o activitate activă (${existingActive.name}). Oprește-o înainte de a crea alta.` });
         }
         
-        // 1. Creare Cod Unic
         let uniqueCode = generateUniqueCode();
-        // 2. Creare Activitate în Sequelize
         const activity = await Activity.create({
             name, 
             description, 
             durationMinutes, 
             uniqueCode,
-            professorId: professorId, // Folosim 'professorId' conform modelului Sequelize
+            professorId: professorId, 
             startTime: currentTime,
         });
         
