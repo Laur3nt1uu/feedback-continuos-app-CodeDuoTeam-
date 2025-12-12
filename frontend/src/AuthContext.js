@@ -13,36 +13,40 @@ export const AuthProvider = ({ children }) => {
     
     const [user, setUser] = useState(() => {
         try {
-            const userProfile = localStorage.getItem('userProfile');
-            const token = localStorage.getItem('userToken');
-            
-           
+            // Folosim sessionStorage ca să nu rămână logat în tab-uri noi
+            const userProfile = sessionStorage.getItem('userProfile');
+            const token = sessionStorage.getItem('userToken');
+
             if (userProfile && token) {
                 return { ...JSON.parse(userProfile), token };
             }
             return null; 
         } catch (error) {
-            console.error("Eroare la parsarea localStorage:", error);
+            console.error("Eroare la parsarea sessionStorage:", error);
             return null;
         }
     });
 
     
     const login = (userData) => {
-        
         setUser(userData);
-        localStorage.setItem('userToken', userData.token);
-        
-        localStorage.setItem('userProfile', JSON.stringify({
+        // Salvăm în sessionStorage pentru sesiunea curentă/tab curent
+        sessionStorage.setItem('userToken', userData.token);
+        sessionStorage.setItem('userProfile', JSON.stringify({
             _id: userData._id,
             name: userData.name,
             role: userData.role
         }));
+        // Curățăm eventuale valori vechi din localStorage (backward compat)
+        localStorage.removeItem('userToken');
+        localStorage.removeItem('userProfile');
     };
 
     
     const logout = () => {
         setUser(null);
+        sessionStorage.removeItem('userToken');
+        sessionStorage.removeItem('userProfile');
         localStorage.removeItem('userToken');
         localStorage.removeItem('userProfile');
     };

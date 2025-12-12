@@ -13,8 +13,8 @@ const api = axios.create({
 
 api.interceptors.request.use(
     (config) => {
-        // Preluăm token-ul din localStorage
-        const token = localStorage.getItem('userToken'); 
+        // Preluăm token-ul din sessionStorage (sesiune pe tab)
+        const token = sessionStorage.getItem('userToken'); 
 
         if (token) {
             
@@ -34,6 +34,8 @@ api.interceptors.response.use(
         
         if (error.response && (error.response.status === 401 || error.response.status === 403)) {
             
+            sessionStorage.removeItem('userToken');
+            sessionStorage.removeItem('userProfile');
             localStorage.removeItem('userToken');
             localStorage.removeItem('userProfile');
             
