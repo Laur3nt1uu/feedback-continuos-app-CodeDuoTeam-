@@ -32,23 +32,8 @@ Aplicația este formată din **backend Node.js** și **frontend React SPA**.
 
 ---
 
-## 4. Planul nostru de realizare al proiectului
-
-### Etapa 1 – Structura proiectului și cod minimal
-- Creăm folderele `server` și `client` și punem fișierele principale (`index.js`, `App.js`, `README.md` etc.)  
-- **Backend:** facem modelele `Activity` și `Feedback`, creăm rutele principale (fără toate validările)  
-- **Frontend:** pagini SPA minimale – `StudentJoin`, `ActivityView`, `ProfessorDashboard`  
-- Adăugăm README cu descriere, specificații și plan  
-- Punem proiectul pe GitHub  
-
-
-
-**ETAPELE SUNT ORIENTATIVE SI NE AJUTA PE NOI SA NE DESFASURAM PROIECTUL INTR-O MANIERA ORGANIZATA SI TOTODATA SA INTELEGETI SI DUMNEAVOASTRA PROCESUL PRIN CARE TRECEM**
-**VOM ADAUGA ETAPELE PE PARCURS**
 
 ## 5. Structura proiectului
-
-
 
 ✅ Funcționalități principale
 
@@ -81,7 +66,9 @@ Cerințe
 ```powershell
 cd backend
 npm install
+```
 Creeaza fisierul .env cu urmatoarea configuratie:
+```powershell
 # DB_NAME=feedback_continuous_dev
 # DB_USER=postgres
 # DB_PASSWORD=your-password
@@ -91,20 +78,16 @@ Creeaza fisierul .env cu urmatoarea configuratie:
 # FRONTEND_URL=http://localhost:3000
 # EMAIL_USER=your-email@gmail.com
 # EMAIL_PASSWORD=your-email-password
-
-npm 
 ```
-
-Notă: în producție (Render) setează `DATABASE_URL` în setările serviciului Render și nu mai e nevoie de DB_NAME/DB_USER/DB_PASSWORD.
+```powershell
+npm run dev
+```
 
 2) Frontend
 
 ```powershell
 cd frontend
 npm install
-# Creează .env în folderul frontend:
-# REACT_APP_BASE_URL=http://localhost:5000/api
-
 npm start
 ```
 
