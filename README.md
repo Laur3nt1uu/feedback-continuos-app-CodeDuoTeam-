@@ -91,7 +91,7 @@ npm install
 ```
 Creeaza fisierul .env cu urmatoarea configuratie:
 ```powershell
-#APP_BASE_URL=http://localhost:5000/api
+#REACT_APP_BASE_URL=http://localhost:5000/api
 
 ```
 
