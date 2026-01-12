@@ -39,11 +39,20 @@ const ForgotPassword = () => {
 
         try {
             const response = await api.post('/users/forgot-password', { email });
-            setMessage(response.data.message || `Email trimis cu succes`);
+            setMessage(response.data.message || 'Link generat cu succes');
             setSuccessEmail(email);
+            
+            // Dacă backend returnează link direct (pentru demo)
+            if (response.data.resetLink) {
+                // Afișăm link-ul și îl deschidem automat
+                setTimeout(() => {
+                    window.open(response.data.resetLink, '_blank');
+                }, 1000);
+            }
+            
             setEmail('');
         } catch (err) {
-            setError(err.response?.data?.message || 'Eroare la trimiterea emailului');
+            setError(err.response?.data?.message || 'Eroare la generarea link-ului');
         } finally {
             setLoading(false);
         }

@@ -19,9 +19,9 @@ if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
 
 // Configurare Nodemailer pentru trimitere email
 const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp-relay.brevo.com',
-    port: process.env.SMTP_PORT || 587,
-    secure: false,
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: process.env.SMTP_PORT || 465,
+    secure: true, // true for 465
     auth: {
         user: process.env.EMAIL_USER || 'placeholder@gmail.com',
         pass: process.env.EMAIL_PASSWORD || 'placeholder',
@@ -200,30 +200,29 @@ const forgotPassword = async (req, res) => {
         subject: 'Resetare parolă - Feedback Continuu',
         html: `
             <h2>Resetare parolă</h2>
-            <p>Introduceți email-ul</p>
+            <p>Ai solicitat resetarea parolei pentru contul tău.</p>
+            <p>Click pe butonul de mai jos pentru a reseta parola:</p>
             <a href="${resetURL}" target="_blank" rel="noopener noreferrer" style="background-color: #6366f1; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
                 Resetare parolă
             </a>
+            <p>Sau copiază acest link în browser:</p>
             <p><a href="${resetURL}" target="_blank" rel="noopener noreferrer">${resetURL}</a></p>
+            <p><small>Link-ul expiră în 30 de minute.</small></p>
         `,
     };
 
     try {
-        // Loguri utile doar în development
-        if (process.env.NODE_ENV !== 'production') {
-            console.log('Sending email to:', email);
-            console.log('Email user:', process.env.EMAIL_USER);
-            console.log('Reset URL:', resetURL);
-        }
-
         await transporter.sendMail(mailOptions);
         console.log('Email sent successfully to:', email);
-        // Răspuns generic (nu expunem URL-ul în API în varianta finală)
-        res.json({ message: 'Email de resetare parolă a fost trimis. Verificați inbox-ul dumneavoastră.' });
+        res.json({ message: 'Email de resetare parolă a fost trimis. Verificați inbox-ul sau folderul Spam.' });
     } catch (error) {
         console.error('Eroare trimitere email:', error.message);
-        console.error('Full error:', error);
-        res.status(500).json({ message: `Eroare la trimiterea emailului: ${error.message}` });
+        // Fallback: returnăm link-ul direct dacă email-ul eșuează
+        res.json({ 
+            message: 'Email temporar indisponibil. Folosește link-ul direct:',
+            resetLink: resetURL,
+            note: 'Copiază link-ul de mai sus pentru a reseta parola.'
+        });
     }
 };
 
