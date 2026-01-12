@@ -42,8 +42,14 @@ defineRelations();
 
 const app = express();
 
-
-app.use(cors());
+// CORS configuration - permite requesturi de la frontend
+app.use(cors({
+    origin: [
+        'https://feedback-continuos-app-codeduoteam-1.onrender.com',
+        'http://localhost:3000'
+    ],
+    credentials: true
+}));
 app.use(express.json());
 
 // Health check endpoint for monitoring and debugging
