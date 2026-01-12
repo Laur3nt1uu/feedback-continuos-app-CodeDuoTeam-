@@ -203,10 +203,17 @@ const forgotPassword = async (req, res) => {
     try {
         await transporter.sendMail(mailOptions);
         console.log('Email sent successfully to:', email);
-        res.json({ message: 'Email de resetare parolă a fost trimis. Verificați inbox-ul sau folderul Spam.' });
+        res.json({ 
+            message: 'Email de resetare parolă a fost trimis. Verificați inbox-ul sau folderul Spam.',
+            resetLink: resetURL
+        });
     } catch (error) {
         console.error('Eroare trimitere email:', error.message);
-        res.status(500).json({ message: 'Eroare la trimiterea emailului. Contactează administratorul.' });
+        // Fallback: returnez link-ul oricum să se poată deschide direct
+        res.json({ 
+            message: 'Eroare la trimiterea emailului. Iată link-ul de resetare (deschide-l în browser):',
+            resetLink: resetURL
+        });
     }
 };
 
