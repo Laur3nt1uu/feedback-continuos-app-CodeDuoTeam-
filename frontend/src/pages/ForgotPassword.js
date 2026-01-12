@@ -105,7 +105,7 @@ const ForgotPassword = () => {
                         <label>Email:</label>
                         <motion.input
                             type="email"
-                            placeholder="email@upb.ro"
+                            placeholder="Email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
