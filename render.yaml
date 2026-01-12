@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: feedback-app-backend
+    env: node
+    region: frankfurt
+    plan: starter
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+
+  - type: static_site
+    name: feedback-app-frontend
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: frontend/build
+    routes:
+      - path: /*
+        destination: /index.html
