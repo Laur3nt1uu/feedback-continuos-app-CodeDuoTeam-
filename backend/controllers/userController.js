@@ -18,11 +18,14 @@ if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
 }
 
 // Configurare Nodemailer pentru trimitere email
+// Folosește Brevo (compatibil cu Render gratuit, spre deosebire de Gmail)
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: process.env.SMTP_HOST || 'smtp-relay.brevo.com',
+    port: parseInt(process.env.SMTP_PORT) || 587,
+    secure: false,
     auth: {
-        user: process.env.EMAIL_USER || 'placeholder@gmail.com',
-        pass: process.env.EMAIL_PASSWORD || 'placeholder',
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD,
     },
 });
 
@@ -215,11 +218,12 @@ const forgotPassword = async (req, res) => {
         res.json({ message: 'Email de resetare parolă a fost trimis. Verificați inbox-ul sau folderul Spam.' });
     } catch (error) {
         console.error('Eroare trimitere email:', error.message);
-        // Fallback: returnăm link-ul direct dacă email-ul eșuează
+        // Fallback pentru demo: returnăm link-ul direct
+        console.log('Fallback - returning reset link directly');
         res.json({ 
-            message: 'Email temporar indisponibil. Folosește link-ul direct:',
+            message: 'Link de resetare generat cu succes!',
             resetLink: resetURL,
-            note: 'Copiază link-ul de mai sus pentru a reseta parola.'
+            note: 'Pentru DEMO: Hosting-ul gratuit blochează SMTP. Link-ul se va deschide automat.'
         });
     }
 };
