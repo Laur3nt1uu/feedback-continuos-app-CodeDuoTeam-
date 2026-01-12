@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { motion, AnimatePresence } from 'framer-motion';
 import EmoticonButton from '../components/EmoticonButton';
 
-const API_BASE_URL = process.env.REACT_APP_BASE_URL || 'http://localhost:5000/api'; 
-const API_URL_FEEDBACK = `${API_BASE_URL}/feedback`;
+const API_URL_FEEDBACK = `/feedback`;
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -41,7 +40,7 @@ const StudentPage = () => {
     try {
       // Trim whitespace and ensure uppercase before sending to backend
       const normalized = code.toString().trim().toUpperCase();
-      const res = await axios.post(`${API_URL_FEEDBACK}/join`, { uniqueCode: normalized }); 
+      const res = await api.post(`${API_URL_FEEDBACK}/join`, { uniqueCode: normalized }); 
       setActivity(res.data);
     } catch (err) {
       setError(err.response?.data?.message || 'Eroare la accesare cod. Verifică codul introdus!');
@@ -60,7 +59,7 @@ const StudentPage = () => {
     }
 
     try {
-      await axios.post(API_URL_FEEDBACK, { 
+      await api.post(API_URL_FEEDBACK, { 
         activityId: activity.activityId, 
         reactionType: type,
         timestamp: new Date().toISOString(), 

@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion'; 
 import { useAuth } from '../AuthContext'; 
-
-const API_BASE_URL = process.env.REACT_APP_BASE_URL || 'http://localhost:5000/api'; 
-const API_URL_USERS = `${API_BASE_URL}/users`;
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -51,7 +48,7 @@ const Register = () => {
         setLoading(true);
 
         try {
-            const res = await axios.post(`${API_URL_USERS}/register`, {
+            const res = await api.post(`/users/register`, {
                 name,
                 email,
                 password,

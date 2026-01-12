@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/f4239838-dd1c-4f5f-84ea-855b3c5cd6a3/resourceGroups/feedback-ase-app-rg/providers/Microsoft.Web/sites/feedback-app-ase",
+    "appService.deploySubpath": "."
+}

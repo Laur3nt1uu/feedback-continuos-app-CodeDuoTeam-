@@ -19,7 +19,9 @@ if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
 
 // Configurare Nodemailer pentru trimitere email
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: process.env.SMTP_HOST || 'smtp-relay.brevo.com',
+    port: process.env.SMTP_PORT || 587,
+    secure: false,
     auth: {
         user: process.env.EMAIL_USER || 'placeholder@gmail.com',
         pass: process.env.EMAIL_PASSWORD || 'placeholder',
@@ -134,11 +136,16 @@ const loginUser = async (req, res) => {
     const user = await User.findOne({ where: { email } });
 
     if (user && (await bcrypt.compare(password, user.password))) {
+        // Actualizăm ultima autentificare
+        user.lastLogin = new Date();
+        await user.save();
+
         res.json({
             _id: user.id,
             name: user.name,
             email: user.email,
             role: user.role,
+            lastLogin: user.lastLogin,
             token: generateToken(user.id),
         });
     } else {
