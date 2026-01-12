@@ -15,10 +15,10 @@ Aplicația este formată din **backend Node.js** și **frontend React SPA**.
 ## 2. Tehnologii folosite
 - **Frontend:** React.js
 - **Backend:** Node.js 
-- **Baza de date:** PostgreSQL / MySQL  
+- **Baza de date:** PostgreSQL  
 - **Versionare:** Git 
-- **Deploy:** inca nu stim 
-- **Inca ne gandim ce tehnologii vom folosi**
+- **Deploy:** Render
+
 
 ---
 
@@ -32,54 +32,100 @@ Aplicația este formată din **backend Node.js** și **frontend React SPA**.
 
 ---
 
-## 4. Planul nostru de realizare al proiectului
 
-### Etapa 1 – Structura proiectului și cod minimal
-- Creăm folderele `server` și `client` și punem fișierele principale (`index.js`, `App.js`, `README.md` etc.)  
-- **Backend:** facem modelele `Activity` și `Feedback`, creăm rutele principale (fără toate validările)  
-- **Frontend:** pagini SPA minimale – `StudentJoin`, `ActivityView`, `ProfessorDashboard`  
-- Adăugăm README cu descriere, specificații și plan  
-- Punem proiectul pe GitHub  
+## 4. Structura proiectului
+
+✅ Funcționalități principale
+
+🔐 Autentificare & Autorizare
+- Înregistrare și autentificare cu token JWT
+- Validarea domeniului de email pentru determinarea rolului (student/profesor)
+- Parole criptate cu bcrypt
+- Dashboard-uri separate pentru profesori și studenți
+
+🗄️ Bază de date & Backend
+- PostgreSQL (Sequelize)
+- API RESTful: rute pentru utilizatori, activități și feedback
+- Validare input și gestionare erori
+
+💻 Frontend
+- React 18 cu hooks și Context API
+- Interfețe responsive pentru mobil și desktop
+- Comunicare cu API folosind Axios
 
 
+🚀 Pornire rapidă
 
-**ETAPELE SUNT ORIENTATIVE SI NE AJUTA PE NOI SA NE DESFASURAM PROIECTUL INTR-O MANIERA ORGANIZATA SI TOTODATA SA INTELEGETI SI DUMNEAVOASTRA PROCESUL PRIN CARE TRECEM**
-**VOM ADAUGA ETAPELE PE PARCURS**
+Cerințe
+- Node.js 18+
+- PostgreSQL 12+
+- npm sau yarn
 
-## 5. Structura proiectului
+1) Backend
+
+```powershell
+cd backend
+npm install
+```
+Creeaza fisierul .env cu urmatoarea configuratie:
+```powershell
+# DB_NAME=feedback_continuous_dev
+# DB_USER=postgres
+# DB_PASSWORD=your-password
+# DB_HOST=localhost
+# DB_PORT=5432
+# JWT_SECRET=your-jwt-secret
+# FRONTEND_URL=http://localhost:3000
+# EMAIL_USER=your-email@gmail.com
+# EMAIL_PASSWORD=your-email-password
+```
+```powershell
+npm run dev
+```
+
+2) Frontend
+
+```powershell
+cd frontend
+npm install
+```
+Creeaza fisierul .env cu urmatoarea configuratie:
+```powershell
+#REACT_APP_BASE_URL=http://localhost:5000/api
 
 ```
-feedback-continuous-app/
-│
-├── server/                     # backend Node.js
-│   ├── index.js
-│   ├── db.js
-│   ├── package.json
-│   ├── models/
-│   │   ├── Activity.js
-│   │   └── Feedback.js
-│   └── routes/
-│       ├── activities.js
-│       └── feedback.js
-│
-├── client/                     # frontend React SPA
-│   ├── package.json
-│   └── src/
-│       ├── index.js
-│       ├── App.js
-│       ├── pages/
-│       │   ├── StudentJoin.js
-│       │   ├── ActivityView.js
-│       │   └── ProfessorDashboard.js
-│       ├── components/
-│       │   ├── EmojiButton.js
-│       │   └── LiveChart.js
-│       └── services/
-│           ├── api.js
-│           └── socket.js
-│
-└── README.md
+
+```powershell
+npm start
 ```
 
----
-**DETALII DESPRE CUM SE VA PUTEA RULA PROIECTUL VETI PRIMII ATUNCI CAND VOM LANSA DEMO-UL**
+3) Acces
+- Frontend: http://localhost:3000
+- API Backend: http://localhost:5000
+
+
+� Endpoint-uri principale 
+
+- Utilizatori
+	- POST /api/users/register — înregistrare
+	- POST /api/users/login — autentificare
+	- POST /api/users/forgot-password — solicitare reset parolă
+	- GET /api/users/reset-password/:token — validare token
+	- POST /api/users/reset-password/:token — reset parolă
+
+- Activități 
+	- POST /api/activities — creează activitate 
+	- GET /api/activities/active — preia activitatea activă 
+	- GET /api/activities/:id/feedback — preia feedback-ul pentru o activitate
+
+- Feedback 
+	- POST /api/feedback/join — alăturare la activitate folosind `uniqueCode` 
+	- POST /api/feedback — trimite feedback 
+
+🚀 Deploy
+
+Aplicația este complet configurată si lansata folosind Render.
+
+
+
+
