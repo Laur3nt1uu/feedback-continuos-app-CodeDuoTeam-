@@ -19,9 +19,7 @@ if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
 
 // Configurare Nodemailer pentru trimitere email
 const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: process.env.SMTP_PORT || 465,
-    secure: true, // true for 465
+    service: 'gmail',
     auth: {
         user: process.env.EMAIL_USER || 'placeholder@gmail.com',
         pass: process.env.EMAIL_PASSWORD || 'placeholder',
