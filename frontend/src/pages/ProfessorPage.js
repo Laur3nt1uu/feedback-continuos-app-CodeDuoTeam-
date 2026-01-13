@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import api from '../api'; 
 import { motion, AnimatePresence } from 'framer-motion';
+import Toast from '../components/Toast';
 import { 
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell
 } from 'recharts';
@@ -29,7 +30,11 @@ const ProfessorPage = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [initialLoad, setInitialLoad] = useState(true);
-    const [showCreateForm, setShowCreateForm] = useState(false); 
+    const [showCreateForm, setShowCreateForm] = useState(false);
+    const [toast, setToast] = useState({ message: '', type: '' });
+    const [stoppingActivity, setStoppingActivity] = useState(false);
+    const [activityHistory, setActivityHistory] = useState([]);
+    const [showHistory, setShowHistory] = useState(false); 
 
     const fetchFeedback = useCallback(async (activityId) => {
         try {
@@ -81,11 +86,66 @@ const ProfessorPage = () => {
         try {
             const res = await api.post(API_URL_ACTIVITIES, { name, description: name, durationMinutes: duration });
             setCurrentActivity(res.data);
-            fetchFeedback(res.data.id); 
+            fetchFeedback(res.data.id);
+            setToast({ message: `🚀 Activitate "${name}" creată cu succes!`, type: 'success' });
+            setName('');
+            setDuration(30);
+            setShowCreateForm(false);
         } catch (err) {
-            setError(err.response?.data?.message || 'Eroare la creare activitate. Asigură-te că ești logat ca profesor.');
+            const errorMsg = err.response?.data?.message || 'Eroare la creare activitate. Asigură-te că ești logat ca profesor.';
+            setError(errorMsg);
+            setToast({ message: errorMsg, type: 'error' });
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleStopActivity = async () => {
+        if (!currentActivity || !window.confirm('Sigur vrei să oprești activitatea?')) return;
+        
+        setStoppingActivity(true);
+        try {
+            await api.post(`${API_URL_ACTIVITIES}/${currentActivity.id}/end`);
+            setCurrentActivity(null);
+            setFeedbackData([]);
+            setShowHistory(true);
+            fetchActivityHistory();
+            setToast({ message: '⏹️ Activitate oprită cu succes!', type: 'success' });
+        } catch (err) {
+            const errorMsg = err.response?.data?.message || 'Eroare la oprire activitate.';
+            setToast({ message: errorMsg, type: 'error' });
+        } finally {
+            setStoppingActivity(false);
+        }
+    };
+
+    const fetchActivityHistory = useCallback(async () => {
+        try {
+            const res = await api.get(`${API_URL_ACTIVITIES}/history`);
+            setActivityHistory(res.data);
+        } catch (err) {
+            console.error('Eroare la preluare istoric:', err);
+        }
+    }, []);
+
+    const downloadReport = async (activityId, format = 'csv') => {
+        try {
+            const res = await api.get(`${API_URL_ACTIVITIES}/${activityId}/export?format=${format}`, {
+                responseType: format === 'csv' ? 'blob' : 'json'
+            });
+            
+            if (format === 'csv') {
+                const url = window.URL.createObjectURL(new Blob([res.data]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `raport_activitate_${activityId}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                link.parentChild.removeChild(link);
+                setToast({ message: '📥 Raport descărcat cu succes!', type: 'success' });
+            }
+        } catch (err) {
+            setToast({ message: 'Eroare la download raport', type: 'error' });
         }
     };
     
@@ -123,7 +183,79 @@ const ProfessorPage = () => {
         );
     }
 
-    // Stare: fără activitate și formular de creare închis - Empty State
+    // Stare: istoric activități
+    if (showHistory && !currentActivity) {
+        return (
+            <div className="professor-page">
+                <Toast 
+                    message={toast.message} 
+                    type={toast.type}
+                    onClose={() => setToast({ message: '', type: '' })}
+                />
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ type: 'spring', stiffness: 100 }}
+                    style={{ maxWidth: '900px', margin: '0 auto', padding: '20px' }}
+                >
+                    <div className="flex-between mb-4">
+                        <h1 className="text-3xl">📜 Istoric Activități</h1>
+                        <motion.button
+                            onClick={() => setShowHistory(false)}
+                            className="btn-secondary"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            ← Înapoi
+                        </motion.button>
+                    </div>
+
+                    {activityHistory.length === 0 ? (
+                        <motion.div 
+                            className="text-center py-8"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                        >
+                            <p className="text-secondary text-lg">Nu ai nicio activitate completată.</p>
+                        </motion.div>
+                    ) : (
+                        <div className="space-y-3">
+                            {activityHistory.map((activity, idx) => (
+                                <motion.div 
+                                    key={activity.id}
+                                    className="card"
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: idx * 0.05 }}
+                                    style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                                >
+                                    <div>
+                                        <h3 className="text-lg font-semibold">{activity.name}</h3>
+                                        <p className="text-sm text-secondary">
+                                            🕐 {new Date(activity.startTime).toLocaleString()} 
+                                            {activity.endTime && ` - ${new Date(activity.endTime).toLocaleString()}`}
+                                        </p>
+                                        <p className="text-xs text-secondary">Cod: <strong>{activity.uniqueCode}</strong></p>
+                                    </div>
+                                    <motion.button
+                                        onClick={() => downloadReport(activity.id, 'csv')}
+                                        className="btn-primary"
+                                        style={{ padding: '8px 16px' }}
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                    >
+                                        📥 Descarcă Raport
+                                    </motion.button>
+                                </motion.div>
+                            ))}
+                        </div>
+                    )}
+                </motion.div>
+            </div>
+        );
+    }
+
+    // Stare: fără activitate și formular de criere închis - Empty State
     if (!currentActivity && !showCreateForm) {
         return (
             <div className="professor-page flex-center" style={{ minHeight: '70vh' }}>
@@ -247,7 +379,12 @@ const ProfessorPage = () => {
     if (currentActivity) {
         if (!showCreateForm) {
             return (
-                <div className="professor-page flex-center" style={{ minHeight: '70vh' }}>
+                <div className="professor-page">
+                    <Toast 
+                        message={toast.message} 
+                        type={toast.type}
+                        onClose={() => setToast({ message: '', type: '' })}
+                    />
                     <motion.div 
                         className="text-center"
                         initial={{ opacity: 0, scale: 0.9 }}
@@ -364,14 +501,33 @@ const ProfessorPage = () => {
 
     return (
         <div className="professor-page">
+            <Toast 
+                message={toast.message} 
+                type={toast.type}
+                onClose={() => setToast({ message: '', type: '' })}
+            />
             <motion.div 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
             >
                 <div className="professor-header mb-4">
-                    <h1>📊 Tablou de Bord - Feedback Continuu</h1>
-                    <p>Monitorează feedback-ul elevilor în timp real</p>
+                    <div className="flex-between">
+                        <div>
+                            <h1>📊 Tablou de Bord - Feedback Continuu</h1>
+                            <p>Monitorează feedback-ul elevilor în timp real</p>
+                        </div>
+                        <motion.button
+                            onClick={handleStopActivity}
+                            disabled={stoppingActivity}
+                            className="btn-danger"
+                            style={{ padding: '10px 20px', backgroundColor: '#ef4444' }}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            {stoppingActivity ? '⏳ Se oprește...' : '⏹️ Oprește Activitate'}
+                        </motion.button>
+                    </div>
                 </div>
 
                 {/* Activity Status Card */}

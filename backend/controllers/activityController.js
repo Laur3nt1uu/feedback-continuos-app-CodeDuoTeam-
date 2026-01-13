@@ -121,9 +121,100 @@ const getActivityFeedback = async (req, res) => {
     }
 };
 
+const endActivity = async (req, res) => {
+    const activityId = req.params.id;
+    const professorId = req.user.id;
+
+    try {
+        const activity = await Activity.findByPk(activityId);
+        if (!activity) {
+            return res.status(404).json({ message: "Activitatea nu a fost găsită." });
+        }
+        if (activity.professorId.toString() !== professorId.toString()) {
+            return res.status(403).json({ message: "Nu aveți dreptul să opriți această activitate." });
+        }
+
+        activity.endTime = new Date();
+        await activity.save();
+
+        res.status(200).json({ message: "Activitate oprită cu succes.", activity });
+    } catch (error) {
+        console.error("Eroare la oprire activitate:", error);
+        res.status(500).json({ message: 'Eroare la oprire activitate.' });
+    }
+};
+
+const getActivityHistory = async (req, res) => {
+    const professorId = req.user.id;
+
+    try {
+        const activities = await Activity.findAll({
+            where: { professorId: professorId },
+            attributes: ['id', 'name', 'startTime', 'endTime', 'durationMinutes', 'uniqueCode'],
+            order: [['startTime', 'DESC']]
+        });
+
+        res.status(200).json(activities);
+    } catch (error) {
+        console.error("Eroare la preluare istoric:", error);
+        res.status(500).json({ message: 'Eroare la preluare istoric.' });
+    }
+};
+
+const exportActivityReport = async (req, res) => {
+    const activityId = req.params.id;
+    const format = req.query.format || 'json';
+    const professorId = req.user.id;
+
+    try {
+        const activity = await Activity.findByPk(activityId);
+        if (!activity) {
+            return res.status(404).json({ message: "Activitatea nu a fost găsită." });
+        }
+        if (activity.professorId.toString() !== professorId.toString()) {
+            return res.status(403).json({ message: "Nu aveți dreptul să exportați acest raport." });
+        }
+
+        const feedbackList = await Feedback.findAll({
+            where: { activityId: activityId },
+            attributes: ['reactionType', 'timestamp'],
+            raw: true
+        });
+
+        const report = {
+            activity: {
+                name: activity.name,
+                startTime: activity.startTime,
+                endTime: activity.endTime,
+                duration: activity.durationMinutes
+            },
+            feedbackCount: feedbackList.length,
+            feedback: feedbackList
+        };
+
+        if (format === 'json') {
+            res.json(report);
+        } else if (format === 'csv') {
+            let csv = 'Tip Reacție,Timp\n';
+            feedbackList.forEach(fb => {
+                csv += `${fb.reactionType},"${new Date(fb.timestamp).toLocaleString()}"\n`;
+            });
+            res.header('Content-Type', 'text/csv');
+            res.header('Content-Disposition', `attachment; filename="raport_${activityId}.csv"`);
+            res.send(csv);
+        }
+    } catch (error) {
+        console.error("Eroare la export raport:", error);
+        res.status(500).json({ message: 'Eroare la export raport.' });
+    }
+};
+
 
 export {
     createActivity,
     getActiveActivity,
     getActivityFeedback,
+    endActivity,
+    getActivityHistory,
+    exportActivityReport,
 };

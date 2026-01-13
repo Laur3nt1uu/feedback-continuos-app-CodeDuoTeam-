@@ -68,7 +68,7 @@ const RootLandingPage = () => {
                             👨‍🏫 Sunt Profesor
                         </motion.button>
                     </Link>
-                    <Link to="/student">
+                    <Link to="/login">
                         <motion.button 
                             className="btn-student"
                             whileHover={{ scale: 1.05 }}
@@ -157,8 +157,10 @@ function App() {
                         <Route path="/login" element={<Login />} />
                         <Route path="/forgot-password" element={<ForgotPassword />} />
                         <Route path="/reset-password/:token" element={<ResetPassword />} />
-                        <Route path="/student" element={<StudentPage />} /> 
-                        <Route path="/student/:uniqueCode" element={<StudentPage />} />
+                        <Route element={<PrivateRoute requiredRole="Student" />}>
+                            <Route path="/student" element={<StudentPage />} /> 
+                            <Route path="/student/:uniqueCode" element={<StudentPage />} />
+                        </Route>
                         
                         <Route element={<PrivateRoute requiredRole="Professor" />}>
                             <Route path="/professor" element={<ProfessorPage />} />
