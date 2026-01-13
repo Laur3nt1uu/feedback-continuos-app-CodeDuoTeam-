@@ -400,8 +400,6 @@ const ProfessorPage = () => {
     }
 
     // Stare: are activitate activă - Dashboard cu grafice și feedback
-    if (currentActivity) {
-
     return (
         <div className="professor-page">
             <Toast 
