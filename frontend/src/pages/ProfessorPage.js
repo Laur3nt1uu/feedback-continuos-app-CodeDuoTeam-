@@ -60,10 +60,24 @@ const ProfessorPage = () => {
         }
     }, [fetchFeedback]); 
     
-    // Check for active activity on mount
+    const fetchActivityHistory = useCallback(async () => {
+        try {
+            const res = await api.get(`${API_URL_ACTIVITIES}/history`);
+            setActivityHistory(res.data);
+            setAllActivities(res.data);
+        } catch (err) {
+            console.error('Eroare la preluare istoric:', err);
+        }
+    }, []);
+    
+    // Check for active activity AND load all activities history on mount
     useEffect(() => {
-        checkActiveActivity();
-    }, [checkActiveActivity]);
+        const initLoad = async () => {
+            await checkActiveActivity();
+            await fetchActivityHistory();
+        };
+        initLoad();
+    }, [checkActiveActivity, fetchActivityHistory]);
     
     // Poll for feedback updates when there's an active activity
     useEffect(() => {
@@ -74,7 +88,29 @@ const ProfessorPage = () => {
         }, 5000); 
         
         return () => clearInterval(interval); 
-    }, [currentActivity, fetchFeedback]); 
+    }, [currentActivity, fetchFeedback]);
+    
+    // Poll to check if current activity has expired or if new activities available
+    useEffect(() => {
+        const interval = setInterval(async () => {
+            await checkActiveActivity();
+            await fetchActivityHistory();
+        }, 10000); // Check every 10 seconds
+        
+        return () => clearInterval(interval);
+    }, [checkActiveActivity, fetchActivityHistory]);
+
+    const loadActivity = async (activityId) => {
+        try {
+            const res = await api.get(`${API_URL_ACTIVITIES}/${activityId}`);
+            setCurrentActivity(res.data);
+            fetchFeedback(activityId);
+            setShowActivitiesList(false);
+        } catch (err) {
+            console.error('Eroare la încărcare activitate:', err);
+            setToast({ message: 'Eroare la încărcare activitate', type: 'error' });
+        }
+    };
 
     const handleCreateActivity = async (e) => {
         e.preventDefault();
@@ -88,6 +124,8 @@ const ProfessorPage = () => {
             setName('');
             setDuration(30);
             setShowCreateForm(false);
+            // Refresh history after creating new activity
+            await fetchActivityHistory();
         } catch (err) {
             const errorMsg = err.response?.data?.message || 'Eroare la creare activitate. Asigură-te că ești logat ca profesor.';
             setError(errorMsg);
@@ -105,7 +143,14 @@ const ProfessorPage = () => {
             await api.post(`${API_URL_ACTIVITIES}/${currentActivity.id}/end`);
             setCurrentActivity(null);
             setFeedbackData([]);
+            
+            // Refresh activities immediately to reflect the endTime change
+            await new Promise(r => setTimeout(r, 300)); // Small delay to ensure DB write
             await fetchActivityHistory();
+            
+            // Close all modals to show empty state with new button states
+            setShowActivitiesList(false);
+            setShowHistory(false);
             setToast({ message: '⏹️ Activitate oprită cu succes!', type: 'success' });
         } catch (err) {
             const errorMsg = err.response?.data?.message || 'Eroare la oprire activitate.';
@@ -115,42 +160,23 @@ const ProfessorPage = () => {
         }
     };
 
-    const fetchActivityHistory = useCallback(async () => {
-        try {
-            const res = await api.get(`${API_URL_ACTIVITIES}/history`);
-            setActivityHistory(res.data);
-            setAllActivities(res.data);
-        } catch (err) {
-            console.error('Eroare la preluare istoric:', err);
-        }
-    }, []);
-
-    useEffect(() => {
-        fetchActivityHistory();
-    }, [fetchActivityHistory]);
-
-    const loadActivity = async (activityId) => {
-        try {
-            const res = await api.get(`${API_URL_ACTIVITIES}/${activityId}`);
-            setCurrentActivity(res.data);
-            fetchFeedback(activityId);
-            setShowActivitiesList(false);
-        } catch (err) {
-            console.error('Eroare la încărcare activitate:', err);
-            setToast({ message: 'Eroare la încărcare activitate', type: 'error' });
-        }
-    };
-
-    // Helpers pentru filtrare liste
+    // Helpers pentru filtrare liste - logic corect și real
     const isActivityActive = useCallback((a) => {
-        return !a.endTime && (new Date(a.startTime).getTime() + a.durationMinutes * 60000) > Date.now();
+        // Active = nu a fost oprită manual ȘI nu a expirat încă
+        if (a.endTime) return false; // Dacă e oprită manual, nu-i activă
+        const endTimeMs = new Date(a.startTime).getTime() + a.durationMinutes * 60000;
+        return endTimeMs > Date.now();
     }, []);
+    
     const isActivityPast = useCallback((a) => {
-        const expired = (new Date(a.startTime).getTime() + a.durationMinutes * 60000) <= Date.now();
-        return !!(a.endTime || expired);
+        // Past = a fost oprită manual SAU a expirat
+        if (a.endTime) return true; // Oprită manual
+        const endTimeMs = new Date(a.startTime).getTime() + a.durationMinutes * 60000;
+        return endTimeMs <= Date.now(); // Expirat
     }, []);
+    
     const activeActivities = allActivities.filter(isActivityActive);
-    const pastActivities = activityHistory.filter(isActivityPast);
+    const pastActivities = allActivities.filter(isActivityPast);
 
     const downloadReport = async (activityId, format = 'csv') => {
         try {

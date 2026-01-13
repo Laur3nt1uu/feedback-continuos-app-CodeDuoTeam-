@@ -83,7 +83,8 @@ const getActiveActivity = async (req, res) => {
             uniqueCode: activity.uniqueCode, 
             startTime: activity.startTime,
             durationMinutes: activity.durationMinutes,
-            name: activity.name
+            name: activity.name,
+            endTime: activity.endTime
         });
 
     } catch (error) {
