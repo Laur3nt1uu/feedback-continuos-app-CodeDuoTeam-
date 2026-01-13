@@ -122,7 +122,44 @@ const ProfessorPage = () => {
         );
     }
 
+    const [showCreateForm, setShowCreateForm] = useState(false);
+
     if (!currentActivity) {
+        if (!showCreateForm) {
+            return (
+                <div className="professor-page flex-center" style={{ minHeight: '70vh' }}>
+                    <motion.div 
+                        className="text-center"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ type: 'spring', stiffness: 100 }}
+                        style={{ maxWidth: '500px', padding: '40px' }}
+                    >
+                        <motion.div 
+                            style={{ fontSize: '5rem', marginBottom: '20px' }}
+                            animate={{ y: [0, -10, 0] }}
+                            transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
+                        >
+                            📋
+                        </motion.div>
+                        <h2 className="text-2xl mb-3">Nu există nicio activitate înregistrată</h2>
+                        <p className="text-secondary mb-4">
+                            Creează o activitate nouă pentru a începe să primești feedback de la studenți
+                        </p>
+                        <motion.button
+                            onClick={() => setShowCreateForm(true)}
+                            className="btn-start btn-lg"
+                            style={{ fontSize: '1.1rem', padding: '15px 40px' }}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            ➕ Adaugă Activitate
+                        </motion.button>
+                    </motion.div>
+                </div>
+            );
+        }
+
         return (
             <div className="professor-page">
                 <motion.div 
@@ -132,8 +169,18 @@ const ProfessorPage = () => {
                     transition={{ type: 'spring', stiffness: 100 }}
                     style={{ maxWidth: '600px', margin: '0 auto' }}
                 >
-                    <h1 className="text-3xl mb-3">Creează o Nouă Activitate</h1>
-                    <p className="text-secondary mb-4">Configurează parametrii cursuluи sau activității tale</p>
+                    <div className="flex-between mb-4">
+                        <h1 className="text-3xl">Creează o Nouă Activitate</h1>
+                        <motion.button
+                            onClick={() => setShowCreateForm(false)}
+                            className="btn-secondary"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            ← Înapoi
+                        </motion.button>
+                    </div>
+                    <p className="text-secondary mb-4">Configurează parametrii cursului sau activității tale</p>
                     
                     <form onSubmit={handleCreateActivity} className="activity-form">
                         <div className="form-control">

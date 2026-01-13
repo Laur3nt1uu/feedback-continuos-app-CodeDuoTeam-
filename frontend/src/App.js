@@ -18,6 +18,10 @@ const RootLandingPage = () => {
     if (isAuthenticated && user.role === 'Professor') {
         return <Navigate to="/professor" replace />;
     }
+    
+    if (isAuthenticated && user.role === 'Student') {
+        return <Navigate to="/student" replace />;
+    }
 
     const containerVariants = {
         hidden: { opacity: 0 },
