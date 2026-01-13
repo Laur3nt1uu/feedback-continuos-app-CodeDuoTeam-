@@ -58,18 +58,21 @@ const ProfessorPage = () => {
         }
     }, [fetchFeedback]); 
     
+    // Check for active activity on mount
     useEffect(() => {
         checkActiveActivity();
+    }, [checkActiveActivity]);
+    
+    // Poll for feedback updates when there's an active activity
+    useEffect(() => {
+        if (!currentActivity) return;
         
-        let interval;
-        if (currentActivity) {
-            interval = setInterval(() => {
-                fetchFeedback(currentActivity.id);
-            }, 5000); 
-        }
+        const interval = setInterval(() => {
+            fetchFeedback(currentActivity.id);
+        }, 5000); 
         
         return () => clearInterval(interval); 
-    }, [currentActivity, fetchFeedback, checkActiveActivity]); 
+    }, [currentActivity, fetchFeedback]); 
 
     const handleCreateActivity = async (e) => {
         e.preventDefault();
@@ -100,8 +103,7 @@ const ProfessorPage = () => {
             await api.post(`${API_URL_ACTIVITIES}/${currentActivity.id}/end`);
             setCurrentActivity(null);
             setFeedbackData([]);
-            setShowHistory(true);
-            fetchActivityHistory();
+            await fetchActivityHistory();
             setToast({ message: '⏹️ Activitate oprită cu succes!', type: 'success' });
         } catch (err) {
             const errorMsg = err.response?.data?.message || 'Eroare la oprire activitate.';
@@ -137,7 +139,7 @@ const ProfessorPage = () => {
                 link.setAttribute('download', `raport_activitate_${activityId}.csv`);
                 document.body.appendChild(link);
                 link.click();
-                link.parentChild.removeChild(link);
+                document.body.removeChild(link);
                 setToast({ message: '📥 Raport descărcat cu succes!', type: 'success' });
             }
         } catch (err) {
@@ -238,6 +240,11 @@ const ProfessorPage = () => {
     if (!currentActivity && !showCreateForm) {
         return (
             <div className="professor-page flex-center" style={{ minHeight: '70vh' }}>
+                <Toast 
+                    message={toast.message} 
+                    type={toast.type}
+                    onClose={() => setToast({ message: '', type: '' })}
+                />
                 <motion.div 
                     className="text-center"
                     initial={{ opacity: 0, scale: 0.9 }}
@@ -252,19 +259,32 @@ const ProfessorPage = () => {
                     >
                         📋
                     </motion.div>
-                    <h2 className="text-2xl mb-3">Nu există nicio activitate înregistrată</h2>
+                    <h2 className="text-2xl mb-3">Nu există nicio activitate activă</h2>
                     <p className="text-secondary mb-4">
                         Creează o activitate nouă pentru a începe să primești feedback de la studenți
                     </p>
-                    <motion.button
-                        onClick={() => setShowCreateForm(true)}
-                        className="btn-start btn-lg"
-                        style={{ fontSize: '1.1rem', padding: '15px 40px' }}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                    >
-                        ➕ Adaugă Activitate
-                    </motion.button>
+                    <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                        <motion.button
+                            onClick={() => setShowCreateForm(true)}
+                            className="btn-start btn-lg"
+                            style={{ fontSize: '1.1rem', padding: '15px 40px' }}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            ➕ Adaugă Activitate
+                        </motion.button>
+                        {activityHistory.length > 0 && (
+                            <motion.button
+                                onClick={() => setShowHistory(true)}
+                                className="btn-secondary btn-lg"
+                                style={{ fontSize: '1.1rem', padding: '15px 40px' }}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                            >
+                                📜 Vezi Istoric
+                            </motion.button>
+                        )}
+                    </div>
                 </motion.div>
             </div>
         );
@@ -274,6 +294,11 @@ const ProfessorPage = () => {
     if (!currentActivity && showCreateForm) {
         return (
             <div className="professor-page">
+                <Toast 
+                    message={toast.message} 
+                    type={toast.type}
+                    onClose={() => setToast({ message: '', type: '' })}
+                />
                 <motion.div 
                     className="activity-section"
                     initial={{ opacity: 0, y: 20 }}
