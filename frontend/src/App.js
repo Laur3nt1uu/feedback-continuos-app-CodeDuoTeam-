@@ -96,9 +96,8 @@ const AppHeader = () => {
         <header className="navbar">
             <div className="navbar-content">
                                 <Link to={isAuthenticated && user?.role === 'Professor' ? '/professor' : '/'} 
-                                            className="navbar-brand" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                        <img src="/favicon.svg" alt="Feedback Logo" width="24" height="24" style={{ display: 'inline-block' }} />
-                                        Feedback App ASE București
+                                            className="navbar-brand">
+                                        📊 FeedbackLive
                                 </Link>
 
                 {isAuthenticated ? (

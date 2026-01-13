@@ -30,6 +30,10 @@ const Activity = sequelize.define('Activity', {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
+    endTime: {
+        type: DataTypes.DATE,
+        allowNull: true,
+    },
     professorId: {
         type: DataTypes.UUID,
         allowNull: false,
