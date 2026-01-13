@@ -67,7 +67,6 @@ const ProfessorPage = () => {
     useEffect(() => {
         if (initialLoad) {
             checkActiveActivity();
-            fetchActivityHistory();
         }
         
         let interval;
@@ -78,7 +77,7 @@ const ProfessorPage = () => {
         }
         
         return () => clearInterval(interval); 
-    }, [currentActivity, initialLoad, fetchFeedback, checkActiveActivity, fetchActivityHistory]); 
+    }, [currentActivity, initialLoad, fetchFeedback, checkActiveActivity]); 
 
     const handleCreateActivity = async (e) => {
         e.preventDefault();
@@ -260,11 +259,6 @@ const ProfessorPage = () => {
     if (!currentActivity && !showCreateForm) {
         return (
             <div className="professor-page flex-center" style={{ minHeight: '70vh' }}>
-                <Toast 
-                    message={toast.message} 
-                    type={toast.type}
-                    onClose={() => setToast({ message: '', type: '' })}
-                />
                 <motion.div 
                     className="text-center"
                     initial={{ opacity: 0, scale: 0.9 }}
@@ -279,32 +273,19 @@ const ProfessorPage = () => {
                     >
                         📋
                     </motion.div>
-                    <h2 className="text-2xl mb-3">Nu există nicio activitate activă</h2>
+                    <h2 className="text-2xl mb-3">Nu există nicio activitate înregistrată</h2>
                     <p className="text-secondary mb-4">
                         Creează o activitate nouă pentru a începe să primești feedback de la studenți
                     </p>
-                    <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', flexWrap: 'wrap' }}>
-                        <motion.button
-                            onClick={() => setShowCreateForm(true)}
-                            className="btn-start btn-lg"
-                            style={{ fontSize: '1.1rem', padding: '15px 40px' }}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                        >
-                            ➕ Adaugă Activitate
-                        </motion.button>
-                        {activityHistory.length > 0 && (
-                            <motion.button
-                                onClick={() => setShowHistory(true)}
-                                className="btn-secondary btn-lg"
-                                style={{ fontSize: '1.1rem', padding: '15px 40px' }}
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                            >
-                                📜 Vezi Istoric
-                            </motion.button>
-                        )}
-                    </div>
+                    <motion.button
+                        onClick={() => setShowCreateForm(true)}
+                        className="btn-start btn-lg"
+                        style={{ fontSize: '1.1rem', padding: '15px 40px' }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        ➕ Adaugă Activitate
+                    </motion.button>
                 </motion.div>
             </div>
         );
@@ -314,11 +295,6 @@ const ProfessorPage = () => {
     if (!currentActivity && showCreateForm) {
         return (
             <div className="professor-page">
-                <Toast 
-                    message={toast.message} 
-                    type={toast.type}
-                    onClose={() => setToast({ message: '', type: '' })}
-                />
                 <motion.div 
                     className="activity-section"
                     initial={{ opacity: 0, y: 20 }}
@@ -400,19 +376,18 @@ const ProfessorPage = () => {
     }
 
     // Stare: are activitate activă - Dashboard cu grafice și feedback
-    if (currentActivity) {
-        return (
-            <div className="professor-page">
-                <Toast 
-                    message={toast.message} 
-                    type={toast.type}
-                    onClose={() => setToast({ message: '', type: '' })}
-                />
-                <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.5 }}
-                >
+    return (
+        <div className="professor-page">
+            <Toast 
+                message={toast.message} 
+                type={toast.type}
+                onClose={() => setToast({ message: '', type: '' })}
+            />
+            <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+            >
                     <div className="professor-header mb-4">
                         <div className="flex-between">
                             <div>
@@ -579,11 +554,7 @@ const ProfessorPage = () => {
                 </p>
             </motion.div>
         </div>
-        );
-    }
-
-    // Fallback - nu ar trebui să ajungem aici
-    return null;
+    );
 };
 
 export default ProfessorPage;
