@@ -141,6 +141,17 @@ const ProfessorPage = () => {
         }
     };
 
+    // Helpers pentru filtrare liste
+    const isActivityActive = useCallback((a) => {
+        return !a.endTime && (new Date(a.startTime).getTime() + a.durationMinutes * 60000) > Date.now();
+    }, []);
+    const isActivityPast = useCallback((a) => {
+        const expired = (new Date(a.startTime).getTime() + a.durationMinutes * 60000) <= Date.now();
+        return !!(a.endTime || expired);
+    }, []);
+    const activeActivities = allActivities.filter(isActivityActive);
+    const pastActivities = activityHistory.filter(isActivityPast);
+
     const downloadReport = async (activityId, format = 'csv') => {
         try {
             const res = await api.get(`${API_URL_ACTIVITIES}/${activityId}/export?format=${format}`, {
@@ -180,7 +191,7 @@ const ProfessorPage = () => {
     }));
 
     // Stare: istoric activități
-        // Stare: listă activități
+        // Stare: listă activități (doar active)
         if (showActivitiesList && !currentActivity) {
             return (
                 <div className="professor-page">
@@ -196,7 +207,7 @@ const ProfessorPage = () => {
                         style={{ maxWidth: '900px', margin: '0 auto', padding: '20px' }}
                     >
                         <div className="flex-between mb-4">
-                            <h1 className="text-3xl">📚 Toate Activitățile</h1>
+                            <h1 className="text-3xl">📚 Activități Active</h1>
                             <motion.button
                                 onClick={() => setShowActivitiesList(false)}
                                 className="btn-secondary"
@@ -207,20 +218,18 @@ const ProfessorPage = () => {
                             </motion.button>
                         </div>
 
-                        {allActivities.length === 0 ? (
+                        {activeActivities.length === 0 ? (
                             <motion.div 
                                 className="text-center py-8"
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                             >
-                                <p className="text-secondary text-lg">Nu ai nicio activitate creată.</p>
+                                <p className="text-secondary text-lg">Nu ai nicio activitate activă.</p>
                             </motion.div>
                         ) : (
                             <div className="space-y-3">
-                                {allActivities.map((activity, idx) => {
-                                    const isActive = !activity.endTime && 
-                                        new Date(activity.startTime).getTime() + activity.durationMinutes * 60000 > Date.now();
-                                
+                                {activeActivities.map((activity, idx) => {
+                                    const isActive = true;
                                     return (
                                         <motion.div 
                                             key={activity.id}
@@ -290,7 +299,7 @@ const ProfessorPage = () => {
                     style={{ maxWidth: '900px', margin: '0 auto', padding: '20px' }}
                 >
                     <div className="flex-between mb-4">
-                        <h1 className="text-3xl">📜 Istoric Activități</h1>
+                        <h1 className="text-3xl">📜 Activități Completate</h1>
                         <motion.button
                             onClick={() => setShowHistory(false)}
                             className="btn-secondary"
@@ -301,17 +310,17 @@ const ProfessorPage = () => {
                         </motion.button>
                     </div>
 
-                    {activityHistory.length === 0 ? (
+                    {pastActivities.length === 0 ? (
                         <motion.div 
                             className="text-center py-8"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                         >
-                            <p className="text-secondary text-lg">Nu ai nicio activitate completată.</p>
+                            <p className="text-secondary text-lg">Nu ai nicio activitate finalizată.</p>
                         </motion.div>
                     ) : (
                         <div className="space-y-3">
-                            {activityHistory.map((activity, idx) => (
+                            {pastActivities.map((activity, idx) => (
                                 <motion.div 
                                     key={activity.id}
                                     className="card"
@@ -383,7 +392,7 @@ const ProfessorPage = () => {
                         >
                             ➕ Adaugă Activitate
                         </motion.button>
-                        {allActivities.length > 0 && (
+                        {activeActivities.length > 0 && (
                             <motion.button
                                 onClick={() => setShowActivitiesList(true)}
                                 className="btn-primary btn-lg"
@@ -394,7 +403,7 @@ const ProfessorPage = () => {
                                 📚 Vezi Activități
                             </motion.button>
                         )}
-                        {activityHistory.length > 0 && (
+                        {pastActivities.length > 0 && (
                             <motion.button
                                 onClick={() => setShowHistory(true)}
                                 className="btn-secondary btn-lg"
