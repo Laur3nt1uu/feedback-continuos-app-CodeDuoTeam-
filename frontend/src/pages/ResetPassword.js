@@ -71,7 +71,6 @@ const ResetPassword = () => {
         }
     };
 
-    // Succes
     if (success) {
         return (
             <div className="auth-page">
@@ -117,7 +116,6 @@ const ResetPassword = () => {
         );
     }
 
-    // Form
     return (
         <div className="auth-page">
             <motion.div 

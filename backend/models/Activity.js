@@ -30,7 +30,6 @@ const Activity = sequelize.define('Activity', {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
-    // Foreign key to User (Professor)
     professorId: {
         type: DataTypes.UUID,
         allowNull: false,

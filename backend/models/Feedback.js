@@ -22,7 +22,6 @@ const Feedback = sequelize.define('Feedback', {
         defaultValue: true,
         allowNull: false,
     },
-    // Foreign key to Activity
     activityId: {
         type: DataTypes.UUID,
         allowNull: false,

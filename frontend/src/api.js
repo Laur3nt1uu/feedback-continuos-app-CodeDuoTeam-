@@ -18,7 +18,6 @@ const api = axios.create({
 
 api.interceptors.request.use(
     (config) => {
-        // Preluăm token-ul din sessionStorage (sesiune pe tab)
         const token = sessionStorage.getItem('userToken'); 
 
         if (token) {

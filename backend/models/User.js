@@ -1,24 +1,22 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../config/db.js'; 
 
-// Domenii email pentru Studenți
 const STUDENT_EMAIL_DOMAINS = [
-    '@stud.ase.ro',         // ASE - Studenți
-    '@student.ase.ro',      // ASE - Studenți (alternativ)
-    '@student.upt.ro',      // UPT - Studenți
-    '@student.utcluj.ro',   // UTC - Studenți
-    '@stud.ubbcluj.ro',     // UBB - Studenți
-    '@student.upb.ro',      // UPB - Studenți
+    '@stud.ase.ro',         
+    '@student.ase.ro',      
+    '@student.upt.ro',      
+    '@student.utcluj.ro',  
+    '@stud.ubbcluj.ro',     
+    '@student.upb.ro',      
 ];
 
-// Domenii email pentru Profesori
 const PROFESSOR_EMAIL_DOMAINS = [
-    '@ase.ro',              // ASE - Profesori
-    '@ie.ase.ro',           // ASE - Profesori (departament)
-    '@upt.ro',              // UPT - Profesori
-    '@utcluj.ro',           // UTC - Profesori
-    '@ubbcluj.ro',          // UBB - Profesori
-    '@upb.ro',              // UPB - Profesori
+    '@ase.ro',              
+    '@ie.ase.ro',           
+    '@upt.ro',              
+    '@utcluj.ro',          
+    '@ubbcluj.ro',          
+    '@upb.ro',              
 ];
 
 const User = sequelize.define('User', {
@@ -29,13 +27,12 @@ const User = sequelize.define('User', {
         allowNull: false,
     },
     
-    // name
     name: {
         type: DataTypes.STRING,
         allowNull: false,
     },
     
-    // email
+
     email: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -45,7 +42,6 @@ const User = sequelize.define('User', {
         },
     },
     
-    // password
     password: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -57,7 +53,6 @@ const User = sequelize.define('User', {
         allowNull: false,
     },
 
-    // Reset password token și expirare
     resetPasswordToken: {
         type: DataTypes.STRING,
         allowNull: true,
@@ -68,7 +63,6 @@ const User = sequelize.define('User', {
         allowNull: true,
     },
 
-    // Ultima autentificare
     lastLogin: {
         type: DataTypes.DATE,
         allowNull: true,
@@ -78,7 +72,6 @@ const User = sequelize.define('User', {
     timestamps: true, 
 });
 
-// Validare custom la nivel de model
 User.beforeValidate((user) => {
     if (user.email && user.role) {
         const domain = user.email.substring(user.email.lastIndexOf('@')).toLowerCase();

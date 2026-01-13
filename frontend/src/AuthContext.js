@@ -13,7 +13,6 @@ export const AuthProvider = ({ children }) => {
     
     const [user, setUser] = useState(() => {
         try {
-            // Folosim sessionStorage ca să nu rămână logat în tab-uri noi
             const userProfile = sessionStorage.getItem('userProfile');
             const token = sessionStorage.getItem('userToken');
 
@@ -30,14 +29,12 @@ export const AuthProvider = ({ children }) => {
     
     const login = (userData) => {
         setUser(userData);
-        // Salvăm în sessionStorage pentru sesiunea curentă/tab curent
         sessionStorage.setItem('userToken', userData.token);
         sessionStorage.setItem('userProfile', JSON.stringify({
             _id: userData._id,
             name: userData.name,
             role: userData.role
         }));
-        // Curățăm eventuale valori vechi din localStorage (backward compat)
         localStorage.removeItem('userToken');
         localStorage.removeItem('userProfile');
     };

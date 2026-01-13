@@ -11,13 +11,11 @@ const generateToken = (id) => {
     });
 };
 
-// Verificare configurație email
 if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
     console.warn('⚠️  EMAIL_USER sau EMAIL_PASSWORD nu sunt configurate în .env');
     console.warn('   Email functionality va fi dezactivată');
 }
 
-// Configurare Nodemailer pentru trimitere email
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -26,7 +24,6 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-// Verificăm conexiunea SMTP în development (utile pentru debugging local)
 if (process.env.NODE_ENV !== 'production') {
     transporter.verify().then(() => {
         console.log('✅ SMTP transporter is ready');
@@ -35,11 +32,7 @@ if (process.env.NODE_ENV !== 'production') {
     });
 }
 
-/**
- * @desc    Înregistrare utilizator cu validare domeniu email
- * @route   POST /api/users/register
- * @access  Public
- */
+
 const registerUser = async (req, res) => {
     const { name, email, password, role } = req.body;
 
@@ -48,30 +41,27 @@ const registerUser = async (req, res) => {
         return;
     }
 
-    // Domenii studențești
     const STUDENT_DOMAINS = [
-        '@stud.ase.ro',         // ASE - Studenți
-        '@student.ase.ro',      // ASE - Studenți (alternativ)
-        '@student.upt.ro',      // UPT - Studenți
-        '@student.utcluj.ro',   // UTC - Studenți
-        '@stud.ubbcluj.ro',     // UBB - Studenți
-        '@student.upb.ro',      // UPB - Studenți
+        '@stud.ase.ro',        
+        '@student.ase.ro',      
+        '@student.upt.ro',      
+        '@student.utcluj.ro',  
+        '@stud.ubbcluj.ro',     
+        '@student.upb.ro',      
     ];
 
-    // Domenii profesori
     const PROFESSOR_DOMAINS = [
-        '@ase.ro',              // ASE - Profesori
-        '@ie.ase.ro',           // ASE - Profesori (departament)
-        '@upt.ro',              // UPT - Profesori
-        '@utcluj.ro',           // UTC - Profesori
-        '@ubbcluj.ro',          // UBB - Profesori
-        '@upb.ro',              // UPB - Profesori
+        '@ase.ro',              
+        '@ie.ase.ro',           
+        '@upt.ro',             
+        '@utcluj.ro',           
+        '@ubbcluj.ro',          
+        '@upb.ro',        
     ];
 
     const domain = email.substring(email.lastIndexOf('@')).toLowerCase();
     const userRole = role || 'Student';
 
-    // Validare domeniu în funcție de rol
     if (userRole === 'Student') {
         if (!STUDENT_DOMAINS.includes(domain)) {
             res.status(400).json({ 
@@ -123,18 +113,13 @@ const registerUser = async (req, res) => {
     }
 };
 
-/**
- * @desc    Login utilizator
- * @route   POST /api/users/login
- * @access  Public
- */
+
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ where: { email } });
 
     if (user && (await bcrypt.compare(password, user.password))) {
-        // Actualizăm ultima autentificare
         user.lastLogin = new Date();
         await user.save();
 
@@ -151,11 +136,7 @@ const loginUser = async (req, res) => {
     }
 };
 
-/**
- * @desc    Trimitere email de resetare parolă
- * @route   POST /api/users/forgot-password
- * @access  Public
- */
+
 const forgotPassword = async (req, res) => {
     const { email } = req.body;
 
@@ -171,16 +152,13 @@ const forgotPassword = async (req, res) => {
         return;
     }
 
-    // Generare token de resetare
     const resetToken = crypto.randomBytes(32).toString('hex');
     const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
     
-    // Salvare token și expirare (30 minute)
     user.resetPasswordToken = hashedToken;
     user.resetPasswordExpires = new Date(Date.now() + 30 * 60 * 1000);
     await user.save();
 
-    // URL de resetare parolă
     const resetURL = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
     const mailOptions = {
@@ -209,7 +187,6 @@ const forgotPassword = async (req, res) => {
         });
     } catch (error) {
         console.error('Eroare trimitere email:', error.message);
-        // Fallback: returnez link-ul oricum să se poată deschide direct
         res.json({ 
             message: 'Eroare la trimiterea emailului. Iată link-ul de resetare (deschide-l în browser):',
             resetLink: resetURL
@@ -217,11 +194,7 @@ const forgotPassword = async (req, res) => {
     }
 };
 
-/**
- * @desc    Validare token de resetare
- * @route   GET /api/users/reset-password/:token
- * @access  Public
- */
+
 const validateResetToken = async (req, res) => {
     const { token } = req.params;
 
@@ -230,10 +203,7 @@ const validateResetToken = async (req, res) => {
         return;
     }
 
-    // Hash token din URL
     const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
-
-    // Căutare utilizator cu token valid și neexpired
     const user = await User.findOne({
         where: {
             resetPasswordToken: hashedToken,
@@ -251,11 +221,7 @@ const validateResetToken = async (req, res) => {
     res.json({ message: 'Token valid.' });
 };
 
-/**
- * @desc    Resetare parolă cu token
- * @route   POST /api/users/reset-password/:token
- * @access  Public
- */
+
 const resetPassword = async (req, res) => {
     const { token } = req.params;
     const { password, passwordConfirm } = req.body;
@@ -269,11 +235,8 @@ const resetPassword = async (req, res) => {
         res.status(400).json({ message: 'Parolele nu se potrivesc.' });
         return;
     }
-
-    // Hash token din URL
     const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
-    // Căutare utilizator cu token valid și neexpired
     const user = await User.findOne({
         where: {
             resetPasswordToken: hashedToken,
@@ -288,7 +251,6 @@ const resetPassword = async (req, res) => {
         return;
     }
 
-    // Hash noua parolă
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 

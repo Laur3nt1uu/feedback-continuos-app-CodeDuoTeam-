@@ -38,7 +38,6 @@ const StudentPage = () => {
     setMessage('');
     setLoading(true);
     try {
-      // Trim whitespace and ensure uppercase before sending to backend
       const normalized = code.toString().trim().toUpperCase();
       const res = await api.post(`${API_URL_FEEDBACK}/join`, { uniqueCode: normalized }); 
       setActivity(res.data);
