@@ -28,7 +28,8 @@ const ProfessorPage = () => {
     const [feedbackData, setFeedbackData] = useState([]); 
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const [initialLoad, setInitialLoad] = useState(true); 
+    const [initialLoad, setInitialLoad] = useState(true);
+    const [showCreateForm, setShowCreateForm] = useState(false); 
 
     const fetchFeedback = useCallback(async (activityId) => {
         try {
@@ -122,9 +123,128 @@ const ProfessorPage = () => {
         );
     }
 
-    const [showCreateForm, setShowCreateForm] = useState(false);
+    // Stare: fără activitate și formular de creare închis - Empty State
+    if (!currentActivity && !showCreateForm) {
+        return (
+            <div className="professor-page flex-center" style={{ minHeight: '70vh' }}>
+                <motion.div 
+                    className="text-center"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ type: 'spring', stiffness: 100 }}
+                    style={{ maxWidth: '500px', padding: '40px' }}
+                >
+                    <motion.div 
+                        style={{ fontSize: '5rem', marginBottom: '20px' }}
+                        animate={{ y: [0, -10, 0] }}
+                        transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
+                    >
+                        📋
+                    </motion.div>
+                    <h2 className="text-2xl mb-3">Nu există nicio activitate înregistrată</h2>
+                    <p className="text-secondary mb-4">
+                        Creează o activitate nouă pentru a începe să primești feedback de la studenți
+                    </p>
+                    <motion.button
+                        onClick={() => setShowCreateForm(true)}
+                        className="btn-start btn-lg"
+                        style={{ fontSize: '1.1rem', padding: '15px 40px' }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        ➕ Adaugă Activitate
+                    </motion.button>
+                </motion.div>
+            </div>
+        );
+    }
 
-    if (!currentActivity) {
+    // Stare: formular de creare deschis
+    if (!currentActivity && showCreateForm) {
+        return (
+            <div className="professor-page">
+                <motion.div 
+                    className="activity-section"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ type: 'spring', stiffness: 100 }}
+                    style={{ maxWidth: '600px', margin: '0 auto' }}
+                >
+                    <div className="flex-between mb-4">
+                        <h1 className="text-3xl">Creează o Nouă Activitate</h1>
+                        <motion.button
+                            onClick={() => setShowCreateForm(false)}
+                            className="btn-secondary"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            ← Înapoi
+                        </motion.button>
+                    </div>
+                    <p className="text-secondary mb-4">Configurează parametrii cursului sau activității tale</p>
+                    
+                    <form onSubmit={handleCreateActivity} className="activity-form">
+                        <div className="form-control">
+                            <label htmlFor="name">Nume Curs/Activitate</label>
+                            <motion.input 
+                                id="name"
+                                type="text"
+                                placeholder="Ex: Curs de Matematică - Lecția 5"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                required
+                                whileFocus={{ scale: 1.01 }}
+                                transition={{ type: 'spring', stiffness: 300 }}
+                            />
+                        </div>
+
+                        <div className="form-control">
+                            <label htmlFor="duration">Durată (minute)</label>
+                            <motion.input 
+                                id="duration"
+                                type="number"
+                                placeholder="Durată în minute"
+                                value={duration}
+                                onChange={(e) => setDuration(e.target.value)}
+                                required
+                                min="5"
+                                max="180"
+                                whileFocus={{ scale: 1.01 }}
+                                transition={{ type: 'spring', stiffness: 300 }}
+                            />
+                        </div>
+
+                        <motion.button 
+                            type="submit"
+                            disabled={loading}
+                            className="btn-start btn-lg"
+                            style={{ width: '100%' }}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            {loading ? '⏳ Se generează...' : '🚀 Start Activitate (Generează Cod)'}
+                        </motion.button>
+                    </form>
+
+                    <AnimatePresence>
+                        {error && (
+                            <motion.div 
+                                className="alert alert-danger mt-3"
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                            >
+                                {error}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </motion.div>
+            </div>
+        );
+    }
+
+    // Stare: are activitate activă - Dashboard cu grafice și feedback
+    if (currentActivity) {
         if (!showCreateForm) {
             return (
                 <div className="professor-page flex-center" style={{ minHeight: '70vh' }}>
