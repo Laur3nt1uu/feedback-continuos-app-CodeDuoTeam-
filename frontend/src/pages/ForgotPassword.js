@@ -41,12 +41,7 @@ const ForgotPassword = () => {
             const response = await api.post('/users/forgot-password', { email });
             setMessage(response.data.message || 'Link generat cu succes');
             setSuccessEmail(email);
-            if (response.data.resetLink) {
-                setTimeout(() => {
-                    window.open(response.data.resetLink, '_blank');
-                }, 1000);
-            }
-            
+            // Nu mai deschidem automat linkul; utilizatorul îl deschide din email.
             setEmail('');
         } catch (err) {
             setError(err.response?.data?.message || 'Eroare la generarea link-ului');

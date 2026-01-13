@@ -16,7 +16,9 @@ if (API_BASE_URL) {
 }
 
 if (!API_BASE_URL && typeof window !== 'undefined' && window.location && window.location.origin) {
-    API_BASE_URL = addApiSuffix(window.location.origin);
+    const origin = window.location.origin;
+    const isRenderFrontend = window.location.hostname.endsWith('onrender.com');
+    API_BASE_URL = isRenderFrontend ? renderBackendFallback : addApiSuffix(origin);
 }
 
 // When deployed as static site on Render, the frontend origin serves only static assets;
