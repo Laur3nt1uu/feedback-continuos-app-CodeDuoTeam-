@@ -19,7 +19,6 @@ Aplicația este formată din **backend Node.js** și **frontend React SPA**.
 - **Versionare:** Git 
 - **Deploy:** Render
 
-
 ---
 
 ## 3. Specificații detaliate
@@ -31,7 +30,6 @@ Aplicația este formată din **backend Node.js** și **frontend React SPA**.
 - Feedback-ul rămâne stocat și poate fi accesat și după terminarea activității.  
 
 ---
-
 
 ## 4. Structura proiectului
 
