@@ -24,7 +24,10 @@ const itemVariants = {
     }
 };
 
+import { useParams } from 'react-router-dom';
+
 const Login = () => {
+    const { role } = useParams();
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -33,6 +36,18 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const { login } = useAuth();
+
+    const getRoleLabel = () => {
+        if (role === 'student') return '🎓 Student';
+        if (role === 'professor') return '👨‍🏫 Profesor';
+        return '👤 Utilizator';
+    };
+
+    const getSubtitle = () => {
+        if (role === 'student') return 'Intră în contul de student';
+        if (role === 'professor') return 'Intră în contul de profesor';
+        return 'Intră în contul tău';
+    };
 
     const { email, password } = formData;
 
@@ -82,9 +97,9 @@ const Login = () => {
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.1 }}
                     >
-                        👨‍🏫 Autentificare
+                        {getRoleLabel()} Autentificare
                     </motion.h1>
-                    <p className="auth-subtitle">Intră în contul tău de profesor</p>
+                    <p className="auth-subtitle">{getSubtitle()}</p>
                 </div>
 
                 {error && (

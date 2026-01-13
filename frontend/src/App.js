@@ -59,7 +59,7 @@ const RootLandingPage = () => {
                 </motion.p>
                 
                 <motion.div className="landing-buttons" variants={itemVariants}>
-                    <Link to={isAuthenticated ? '/professor' : '/login'}> 
+                    <Link to={isAuthenticated ? '/professor' : '/login/professor'}> 
                         <motion.button 
                             className="btn-professor"
                             whileHover={{ scale: 1.05 }}
@@ -68,7 +68,7 @@ const RootLandingPage = () => {
                             👨‍🏫 Sunt Profesor
                         </motion.button>
                     </Link>
-                    <Link to="/login">
+                    <Link to="/login/student">
                         <motion.button 
                             className="btn-student"
                             whileHover={{ scale: 1.05 }}
@@ -116,28 +116,16 @@ const AppHeader = () => {
                         </motion.button>
                     </div>
                 ) : (
-                    <div className="flex gap-2">
-                        <Link to="/login">
-                            <motion.button 
-                                className="btn-secondary"
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                style={{ padding: '8px 16px', fontSize: '0.9rem' }}
-                            >
-                                Login
-                            </motion.button>
-                        </Link>
-                        <Link to="/register">
-                            <motion.button 
-                                className="btn-primary"
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                style={{ padding: '8px 16px', fontSize: '0.9rem' }}
-                            >
-                                Register
-                            </motion.button>
-                        </Link>
-                    </div>
+                    <Link to="/register">
+                        <motion.button 
+                            className="btn-primary"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            style={{ padding: '8px 16px', fontSize: '0.9rem' }}
+                        >
+                            Register
+                        </motion.button>
+                    </Link>
                 )}
             </div>
         </header>
@@ -154,7 +142,7 @@ function App() {
                     <Routes>
                         <Route path="/" element={<RootLandingPage />} />
                         <Route path="/register" element={<Register />} />
-                        <Route path="/login" element={<Login />} />
+                        <Route path="/login/:role" element={<Login />} />
                         <Route path="/forgot-password" element={<ForgotPassword />} />
                         <Route path="/reset-password/:token" element={<ResetPassword />} />
                         <Route element={<PrivateRoute requiredRole="Student" />}>
