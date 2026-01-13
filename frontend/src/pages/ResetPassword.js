@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../api';
@@ -13,6 +13,8 @@ const ResetPassword = () => {
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
+    const [tokenStatus, setTokenStatus] = useState('checking'); // checking | valid | invalid
+    const [redirectCountdown, setRedirectCountdown] = useState(4);
 
     const containerVariants = {
         hidden: { opacity: 0 },
@@ -34,11 +36,53 @@ const ResetPassword = () => {
         }
     };
 
+    useEffect(() => {
+        let isMounted = true;
+        const validateToken = async () => {
+            try {
+                await api.get(`/users/reset-password/${token}`);
+                if (isMounted) setTokenStatus('valid');
+            } catch (err) {
+                if (!isMounted) return;
+                setTokenStatus('invalid');
+                setError(err.response?.data?.message || 'Link-ul de resetare este invalid sau a expirat.');
+            }
+        };
+
+        validateToken();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [token]);
+
+    useEffect(() => {
+        if (!success) return;
+
+        const interval = setInterval(() => {
+            setRedirectCountdown((value) => {
+                if (value <= 1) {
+                    navigate('/');
+                    return 0;
+                }
+                return value - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [success, navigate]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError('');
         setMessage('');
+
+        if (tokenStatus !== 'valid') {
+            setError('Link-ul de resetare nu este valid.');
+            setLoading(false);
+            return;
+        }
 
         if (password !== passwordConfirm) {
             setError('Parolele nu se potrivesc');
@@ -60,16 +104,57 @@ const ResetPassword = () => {
             
             setMessage(response.data.message || 'Parola a fost resetată cu succes!');
             setSuccess(true);
-            
-            setTimeout(() => {
-                navigate('/login');
-            }, 3000);
         } catch (err) {
             setError(err.response?.data?.message || 'Eroare la resetarea parolei');
         } finally {
             setLoading(false);
         }
     };
+
+    if (tokenStatus === 'checking') {
+        return (
+            <div className="auth-page">
+                <motion.div 
+                    className="auth-container"
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                >
+                    <motion.h1 variants={itemVariants}>
+                        🔑 Verificăm link-ul...
+                    </motion.h1>
+                    <motion.p variants={itemVariants} style={{ textAlign: 'center' }}>
+                        Te rugăm să aștepți câteva momente.
+                    </motion.p>
+                </motion.div>
+            </div>
+        );
+    }
+
+    if (tokenStatus === 'invalid') {
+        return (
+            <div className="auth-page">
+                <motion.div 
+                    className="auth-container"
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                >
+                    <motion.h1 variants={itemVariants}>
+                        ❌ Link invalid sau expirat
+                    </motion.h1>
+                    <motion.p variants={itemVariants} style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                        {error || 'Link-ul de resetare nu mai este valid.'}
+                    </motion.p>
+                    <motion.div variants={itemVariants}>
+                        <Link to="/forgot-password" style={{ color: '#6366f1', fontWeight: '600' }}>
+                            Trimite un nou link de resetare
+                        </Link>
+                    </motion.div>
+                </motion.div>
+            </div>
+        );
+    }
 
     if (success) {
         return (
@@ -99,16 +184,16 @@ const ResetPassword = () => {
                             ✅ {message || 'Parola a fost resetată cu succes!'}
                         </p>
                         <p style={{ margin: '0.5rem 0', fontSize: '0.9rem' }}>
-                            Puteți folosi noua parolă pentru a vă conecta la cont.
+                            Poți folosi noua parolă pentru a te conecta.
                         </p>
                         <p style={{ margin: '0.5rem 0', fontSize: '0.85rem', color: '#065f46' }}>
-                            Veți fi redirecționat la pagina de conectare în <strong>3 secunde</strong>...
+                            Vei fi redirecționat la pagina principală în <strong>{redirectCountdown} secunde</strong>...
                         </p>
                         <button
-                            onClick={() => navigate('/login')}
+                            onClick={() => navigate('/')}
                             style={{ marginTop: '1rem', padding: '8px 16px', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}
                         >
-                            ✓ Am înțeles
+                            ✓ Mergi acum la pagina principală
                         </button>
                     </motion.div>
                 </motion.div>
