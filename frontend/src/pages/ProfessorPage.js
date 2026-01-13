@@ -400,69 +400,70 @@ const ProfessorPage = () => {
     }
 
     // Stare: are activitate activă - Dashboard cu grafice și feedback
-    return (
-        <div className="professor-page">
-            <Toast 
-                message={toast.message} 
-                type={toast.type}
-                onClose={() => setToast({ message: '', type: '' })}
-            />
-            <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-            >
-                <div className="professor-header mb-4">
-                    <div className="flex-between">
-                        <div>
-                            <h1>📊 Tablou de Bord - Feedback Continuu</h1>
-                            <p>Monitorează feedback-ul elevilor în timp real</p>
-                        </div>
-                        <motion.button
-                            onClick={handleStopActivity}
-                            disabled={stoppingActivity}
-                            className="btn-danger"
-                            style={{ padding: '10px 20px', backgroundColor: '#ef4444' }}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                        >
-                            {stoppingActivity ? '⏳ Se oprește...' : '⏹️ Oprește Activitate'}
-                        </motion.button>
-                    </div>
-                </div>
-
-                {/* Activity Status Card */}
+    if (currentActivity) {
+        return (
+            <div className="professor-page">
+                <Toast 
+                    message={toast.message} 
+                    type={toast.type}
+                    onClose={() => setToast({ message: '', type: '' })}
+                />
                 <motion.div 
-                    className="activity-status"
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
                 >
-                    <div className="flex-between mb-2">
-                        <div>
-                            <h3>🎯 Activitate Activă</h3>
-                            <p><strong>{currentActivity.name}</strong></p>
-                        </div>
-                        <div className="text-right">
-                            <p className="text-sm text-secondary">Cod de Acces</p>
-                            <motion.div 
-                                style={{ 
-                                    fontSize: '2rem', 
-                                    fontWeight: 'bold', 
-                                    color: '#667eea',
-                                    fontFamily: 'monospace'
-                                }}
-                                animate={{ scale: [1, 1.05, 1] }}
-                                transition={{ repeat: Infinity, duration: 2 }}
+                    <div className="professor-header mb-4">
+                        <div className="flex-between">
+                            <div>
+                                <h1>📊 Tablou de Bord - Feedback Continuu</h1>
+                                <p>Monitorează feedback-ul elevilor în timp real</p>
+                            </div>
+                            <motion.button
+                                onClick={handleStopActivity}
+                                disabled={stoppingActivity}
+                                className="btn-danger"
+                                style={{ padding: '10px 20px', backgroundColor: '#ef4444' }}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
                             >
-                                {currentActivity.uniqueCode}
-                            </motion.div>
+                                {stoppingActivity ? '⏳ Se oprește...' : '⏹️ Oprește Activitate'}
+                            </motion.button>
                         </div>
                     </div>
-                    <p className="text-sm text-secondary">
-                        ⏱️ Se încheie la: <strong>{new Date(new Date(currentActivity.startTime).getTime() + currentActivity.durationMinutes * 60000).toLocaleTimeString()}</strong>
-                    </p>
-                </motion.div>
+
+                    {/* Activity Status Card */}
+                    <motion.div 
+                        className="activity-status"
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
+                    >
+                        <div className="flex-between mb-2">
+                            <div>
+                                <h3>🎯 Activitate Activă</h3>
+                                <p><strong>{currentActivity.name}</strong></p>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-sm text-secondary">Cod de Acces</p>
+                                <motion.div 
+                                    style={{ 
+                                        fontSize: '2rem', 
+                                        fontWeight: 'bold', 
+                                        color: '#667eea',
+                                        fontFamily: 'monospace'
+                                    }}
+                                    animate={{ scale: [1, 1.05, 1] }}
+                                    transition={{ repeat: Infinity, duration: 2 }}
+                                >
+                                    {currentActivity.uniqueCode}
+                                </motion.div>
+                            </div>
+                        </div>
+                        <p className="text-sm text-secondary">
+                            ⏱️ Se încheie la: <strong>{new Date(new Date(currentActivity.startTime).getTime() + currentActivity.durationMinutes * 60000).toLocaleTimeString()}</strong>
+                        </p>
+                    </motion.div>
 
                 {/* Stats Cards */}
                 <div className="grid grid-cols-2 gap-3 mb-4" style={{ marginBottom: '30px' }}>
@@ -578,7 +579,11 @@ const ProfessorPage = () => {
                 </p>
             </motion.div>
         </div>
-    );
+        );
+    }
+
+    // Fallback - nu ar trebui să ajungem aici
+    return null;
 };
 
 export default ProfessorPage;
