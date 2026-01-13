@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import api from '../api';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion'; 
 import { useAuth } from '../AuthContext'; 
 
@@ -23,8 +23,6 @@ const itemVariants = {
         transition: { type: 'spring', stiffness: 100 }
     }
 };
-
-import { useParams } from 'react-router-dom';
 
 const Login = () => {
     const { role } = useParams();
