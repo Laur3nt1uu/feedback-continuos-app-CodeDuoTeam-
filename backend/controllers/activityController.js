@@ -18,7 +18,7 @@ const createActivity = async (req, res) => {
         const existingActive = await Activity.findOne({
             where: {
                 professorId: professorId,
-              
+                endTime: null, // Nu a fost oprită manual
                 [Op.and]: [
                     literal(`"startTime" + ("durationMinutes" * interval '1 minute') > NOW()`)
                 ]
@@ -65,7 +65,8 @@ const getActiveActivity = async (req, res) => {
     try {
         const activity = await Activity.findOne({
             where: {
-                professorId: professorId, 
+                professorId: professorId,
+                endTime: null, // Nu a fost oprită manual
                 [Op.and]: [
                     literal(`"startTime" + ("durationMinutes" * interval '1 minute') > NOW()`)
                 ]
@@ -161,6 +162,29 @@ const getActivityHistory = async (req, res) => {
     }
 };
 
+const getActivityById = async (req, res) => {
+    const activityId = req.params.id;
+    const professorId = req.user.id;
+
+    try {
+        const activity = await Activity.findOne({
+            where: { 
+                id: activityId,
+                professorId: professorId
+            }
+        });
+
+        if (!activity) {
+            return res.status(404).json({ message: 'Activitatea nu a fost găsită.' });
+        }
+
+        res.status(200).json(activity);
+    } catch (error) {
+        console.error("Eroare la preluare activitate:", error);
+        res.status(500).json({ message: 'Eroare la preluare activitate.' });
+    }
+};
+
 const exportActivityReport = async (req, res) => {
     const activityId = req.params.id;
     const format = req.query.format || 'json';
@@ -216,5 +240,6 @@ export {
     getActivityFeedback,
     endActivity,
     getActivityHistory,
+    getActivityById,
     exportActivityReport,
 };

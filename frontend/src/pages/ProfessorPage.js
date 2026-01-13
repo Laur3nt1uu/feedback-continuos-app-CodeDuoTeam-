@@ -33,7 +33,9 @@ const ProfessorPage = () => {
     const [toast, setToast] = useState({ message: '', type: '' });
     const [stoppingActivity, setStoppingActivity] = useState(false);
     const [activityHistory, setActivityHistory] = useState([]);
-    const [showHistory, setShowHistory] = useState(false); 
+    const [showHistory, setShowHistory] = useState(false);
+    const [allActivities, setAllActivities] = useState([]);
+    const [showActivitiesList, setShowActivitiesList] = useState(false); 
 
     const fetchFeedback = useCallback(async (activityId) => {
         try {
@@ -117,6 +119,7 @@ const ProfessorPage = () => {
         try {
             const res = await api.get(`${API_URL_ACTIVITIES}/history`);
             setActivityHistory(res.data);
+            setAllActivities(res.data);
         } catch (err) {
             console.error('Eroare la preluare istoric:', err);
         }
@@ -125,6 +128,18 @@ const ProfessorPage = () => {
     useEffect(() => {
         fetchActivityHistory();
     }, [fetchActivityHistory]);
+
+    const loadActivity = async (activityId) => {
+        try {
+            const res = await api.get(`${API_URL_ACTIVITIES}/${activityId}`);
+            setCurrentActivity(res.data);
+            fetchFeedback(activityId);
+            setShowActivitiesList(false);
+        } catch (err) {
+            console.error('Eroare la încărcare activitate:', err);
+            setToast({ message: 'Eroare la încărcare activitate', type: 'error' });
+        }
+    };
 
     const downloadReport = async (activityId, format = 'csv') => {
         try {
@@ -165,6 +180,101 @@ const ProfessorPage = () => {
     }));
 
     // Stare: istoric activități
+        // Stare: listă activități
+        if (showActivitiesList && !currentActivity) {
+            return (
+                <div className="professor-page">
+                    <Toast 
+                        message={toast.message} 
+                        type={toast.type}
+                        onClose={() => setToast({ message: '', type: '' })}
+                    />
+                    <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ type: 'spring', stiffness: 100 }}
+                        style={{ maxWidth: '900px', margin: '0 auto', padding: '20px' }}
+                    >
+                        <div className="flex-between mb-4">
+                            <h1 className="text-3xl">📚 Toate Activitățile</h1>
+                            <motion.button
+                                onClick={() => setShowActivitiesList(false)}
+                                className="btn-secondary"
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                            >
+                                ← Înapoi
+                            </motion.button>
+                        </div>
+
+                        {allActivities.length === 0 ? (
+                            <motion.div 
+                                className="text-center py-8"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                            >
+                                <p className="text-secondary text-lg">Nu ai nicio activitate creată.</p>
+                            </motion.div>
+                        ) : (
+                            <div className="space-y-3">
+                                {allActivities.map((activity, idx) => {
+                                    const isActive = !activity.endTime && 
+                                        new Date(activity.startTime).getTime() + activity.durationMinutes * 60000 > Date.now();
+                                
+                                    return (
+                                        <motion.div 
+                                            key={activity.id}
+                                            className="card"
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: idx * 0.05 }}
+                                            style={{ 
+                                                padding: '16px', 
+                                                display: 'flex', 
+                                                justifyContent: 'space-between', 
+                                                alignItems: 'center',
+                                                borderLeft: isActive ? '4px solid #10b981' : '4px solid #6b7280',
+                                                cursor: 'pointer'
+                                            }}
+                                            whileHover={{ scale: 1.02, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                                            onClick={() => loadActivity(activity.id)}
+                                        >
+                                            <div>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                    <h3 className="text-lg font-semibold">{activity.name}</h3>
+                                                    {isActive && (
+                                                        <span style={{ 
+                                                            fontSize: '0.75rem', 
+                                                            backgroundColor: '#10b981', 
+                                                            color: 'white', 
+                                                            padding: '2px 8px', 
+                                                            borderRadius: '12px' 
+                                                        }}>
+                                                            ● ACTIVĂ
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <p className="text-sm text-secondary">
+                                                    🕐 {new Date(activity.startTime).toLocaleString()} 
+                                                    {activity.endTime && ` - ${new Date(activity.endTime).toLocaleString()}`}
+                                                </p>
+                                                <p className="text-xs text-secondary">
+                                                    Cod: <strong>{activity.uniqueCode}</strong> | 
+                                                    Durată: {activity.durationMinutes} min
+                                                </p>
+                                            </div>
+                                            <div style={{ fontSize: '2rem' }}>→</div>
+                                        </motion.div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </motion.div>
+                </div>
+            );
+        }
+
+        // Stare: istoric activități
     if (showHistory && !currentActivity) {
         return (
             <div className="professor-page">
@@ -273,6 +383,17 @@ const ProfessorPage = () => {
                         >
                             ➕ Adaugă Activitate
                         </motion.button>
+                        {allActivities.length > 0 && (
+                            <motion.button
+                                onClick={() => setShowActivitiesList(true)}
+                                className="btn-primary btn-lg"
+                                style={{ fontSize: '1.1rem', padding: '15px 40px' }}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                            >
+                                📚 Vezi Activități
+                            </motion.button>
+                        )}
                         {activityHistory.length > 0 && (
                             <motion.button
                                 onClick={() => setShowHistory(true)}
@@ -394,9 +515,26 @@ const ProfessorPage = () => {
             >
                     <div className="professor-header mb-4">
                         <div className="flex-between">
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                                                            <motion.button
+                                                                onClick={() => {
+                                                                    setCurrentActivity(null);
+                                                                    setFeedbackData([]);
+                                                                    setShowActivitiesList(false);
+                                                                }}
+                                                                className="btn-secondary"
+                                                                style={{ padding: '8px 16px', fontSize: '0.9rem' }}
+                                                                whileHover={{ scale: 1.05 }}
+                                                                whileTap={{ scale: 0.95 }}
+                                                            >
+                                                                ← Înapoi
+                                                            </motion.button>
+                                                            <div>
                             <div>
                                 <h1>📊 Tablou de Bord - Feedback Continuu</h1>
                                 <p>Monitorează feedback-ul elevilor în timp real</p>
+                                                            </div>
+                                                        </div>
                             </div>
                             <motion.button
                                 onClick={handleStopActivity}
