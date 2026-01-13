@@ -23,11 +23,15 @@ const defineRelations = () => {
 defineRelations();
 const app = express();
 
+const allowedOrigins = [
+    'https://feedback-continuos-app-codeduoteam-1.onrender.com',
+    'https://feedback-app-frontend.onrender.com',
+    'http://localhost:3000',
+    process.env.FRONTEND_URL,
+].filter(Boolean);
+
 app.use(cors({
-    origin: [
-        'https://feedback-continuos-app-codeduoteam-1.onrender.com',
-        'http://localhost:3000'
-    ],
+    origin: allowedOrigins,
     credentials: true
 }));
 app.use(express.json());

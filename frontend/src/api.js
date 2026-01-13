@@ -1,9 +1,30 @@
 import axios from 'axios';
 
+const addApiSuffix = (url) => {
+    if (!url) return url;
+    const hasApi = /\/api\/?$/.test(url);
+    if (hasApi) return url.replace(/\/$/, '');
+    return url.endsWith('/') ? `${url}api` : `${url}/api`;
+};
+
+const renderBackendFallback = 'https://feedback-app-backend.onrender.com/api';
+
 let API_BASE_URL = process.env.REACT_APP_BASE_URL;
-if (!API_BASE_URL && typeof window !== 'undefined' && window.location && window.location.origin) {
-    API_BASE_URL = `${window.location.origin}/api`;
+
+if (API_BASE_URL) {
+    API_BASE_URL = addApiSuffix(API_BASE_URL);
 }
+
+if (!API_BASE_URL && typeof window !== 'undefined' && window.location && window.location.origin) {
+    API_BASE_URL = addApiSuffix(window.location.origin);
+}
+
+// When deployed as static site on Render, the frontend origin serves only static assets;
+// fall back to the backend service domain if we don't have a better hint.
+if (!API_BASE_URL && typeof window !== 'undefined' && window.location.hostname.endsWith('onrender.com')) {
+    API_BASE_URL = renderBackendFallback;
+}
+
 if (!API_BASE_URL) {
     API_BASE_URL = 'http://localhost:5000/api';
 }

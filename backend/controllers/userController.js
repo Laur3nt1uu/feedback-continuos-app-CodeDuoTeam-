@@ -159,7 +159,19 @@ const forgotPassword = async (req, res) => {
     user.resetPasswordExpires = new Date(Date.now() + 30 * 60 * 1000);
     await user.save();
 
-    const resetURL = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+    const defaultFrontend = 'https://feedback-app-frontend.onrender.com';
+    const configured = (process.env.FRONTEND_URL || '').trim();
+    const looksLikeBackend = configured.includes('feedback-continuos-app-codeduoteam-1.onrender.com');
+    const frontendBase = (looksLikeBackend ? defaultFrontend : configured || defaultFrontend).replace(/\/$/, '');
+
+    if (!configured) {
+        console.warn('⚠️  FRONTEND_URL nu este setat; folosim fallback https://feedback-app-frontend.onrender.com');
+    }
+    if (looksLikeBackend) {
+        console.warn('⚠️  FRONTEND_URL pare să indice backend-ul; folosim fallback https://feedback-app-frontend.onrender.com pentru linkul din email');
+    }
+
+    const resetURL = `${frontendBase}/reset-password/${resetToken}`;
 
     const mailOptions = {
         from: process.env.EMAIL_USER,
