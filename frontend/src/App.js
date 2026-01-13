@@ -143,6 +143,7 @@ function App() {
                         <Route path="/" element={<RootLandingPage />} />
                         <Route path="/register" element={<Register />} />
                         <Route path="/login/:role" element={<Login />} />
+                        <Route path="/login" element={<Navigate to="/" replace />} />
                         <Route path="/forgot-password" element={<ForgotPassword />} />
                         <Route path="/reset-password/:token" element={<ResetPassword />} />
                         <Route element={<PrivateRoute requiredRole="Student" />}>

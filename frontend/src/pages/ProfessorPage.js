@@ -29,7 +29,6 @@ const ProfessorPage = () => {
     const [feedbackData, setFeedbackData] = useState([]); 
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const [initialLoad, setInitialLoad] = useState(true);
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [toast, setToast] = useState({ message: '', type: '' });
     const [stoppingActivity, setStoppingActivity] = useState(false);
@@ -47,7 +46,6 @@ const ProfessorPage = () => {
     
     const checkActiveActivity = useCallback(async () => {
         try {
-            setLoading(true);
             const res = await api.get(`${API_URL_ACTIVITIES}/active`);
             setCurrentActivity(res.data); 
             fetchFeedback(res.data.id); 
@@ -55,19 +53,13 @@ const ProfessorPage = () => {
             if (err.response && err.response.status === 404) {
                 setCurrentActivity(null);
             } else {
-                setError(err.response?.data?.message || 'Eroare la verificare activitate activă.');
                 console.error("Eroare la check active:", err);
             }
-        } finally {
-            setLoading(false);
-            setInitialLoad(false); 
         }
     }, [fetchFeedback]); 
     
     useEffect(() => {
-        if (initialLoad) {
-            checkActiveActivity();
-        }
+        checkActiveActivity();
         
         let interval;
         if (currentActivity) {
@@ -77,7 +69,7 @@ const ProfessorPage = () => {
         }
         
         return () => clearInterval(interval); 
-    }, [currentActivity, initialLoad, fetchFeedback, checkActiveActivity]); 
+    }, [currentActivity, fetchFeedback, checkActiveActivity]); 
 
     const handleCreateActivity = async (e) => {
         e.preventDefault();
@@ -128,6 +120,10 @@ const ProfessorPage = () => {
         }
     }, []);
 
+    useEffect(() => {
+        fetchActivityHistory();
+    }, [fetchActivityHistory]);
+
     const downloadReport = async (activityId, format = 'csv') => {
         try {
             const res = await api.get(`${API_URL_ACTIVITIES}/${activityId}/export?format=${format}`, {
@@ -165,23 +161,6 @@ const ProfessorPage = () => {
         value: feedbackCounts[key],
         fill: REACTION_COLORS[key]
     }));
-
-    if (initialLoad) {
-        return (
-            <div className="professor-page flex-center" style={{ minHeight: '100vh' }}>
-                <div className="text-center">
-                    <motion.div 
-                        animate={{ rotate: 360 }}
-                        transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
-                        style={{ fontSize: '3rem', marginBottom: '20px' }}
-                    >
-                        ⏳
-                    </motion.div>
-                    <p className="text-lg">Se verifică activitățile active...</p>
-                </div>
-            </div>
-        );
-    }
 
     // Stare: istoric activități
     if (showHistory && !currentActivity) {
