@@ -1,3 +1,5 @@
+//  Pagina profesorului — arată activități, feedback 
+// Conține UI și apeluri API pentru a administra activitățile
 import React, { useState, useEffect, useCallback } from 'react';
 import api from '../api'; 
 import { motion, AnimatePresence } from 'framer-motion';

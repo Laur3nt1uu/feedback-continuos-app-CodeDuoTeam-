@@ -1,3 +1,5 @@
+// Componenta principală a aplicației care definește rutele și layout-ul.
+// Aici leg paginile între ele
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';

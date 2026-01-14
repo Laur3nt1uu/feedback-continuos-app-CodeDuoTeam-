@@ -1,3 +1,5 @@
+// Middleware care protejează rutele cu JWT — dacă n-ai token, nu intri.
+// verifica token, găseste userul și continua
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js'; 
 

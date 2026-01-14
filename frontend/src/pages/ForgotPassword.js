@@ -1,3 +1,5 @@
+//  Formular simplu ca să primești link de resetare a parolei.
+// Trimiți email și backend se ocupă de rest
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';

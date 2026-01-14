@@ -1,3 +1,5 @@
+// Modelul Activity — reprezintă o activitate/întâlnire în aplicație.
+// folosim oentru a programa activitatile
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../config/db.js';
 

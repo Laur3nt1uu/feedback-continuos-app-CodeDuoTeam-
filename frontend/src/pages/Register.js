@@ -1,3 +1,4 @@
+  // Validare simplă a domeniului email înainte să trimit la server.
 import React, { useState } from 'react';
 import api from '../api';
 import { useNavigate, Link } from 'react-router-dom';
@@ -37,6 +38,14 @@ const Register = () => {
     const { login } = useAuth() || {}; 
 
     const { name, email, password, role } = formData;
+    
+    const STUDENT_DOMAINS = [
+        '@stud.ase.ro'
+    ];
+    const PROFESSOR_DOMAINS = [
+        '@csie.ase.ro',
+         '@ie.ase.ro'
+        ];
 
     const onChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -46,6 +55,28 @@ const Register = () => {
         e.preventDefault();
         setError('');
         setLoading(true);
+
+        try {
+            const domain = (email || '').substring((email || '').lastIndexOf('@')).toLowerCase();
+
+            if (role === 'Student') {
+                if (!STUDENT_DOMAINS.includes(domain)) {
+                    setError(`Studenții trebuie să folosească email din domeniul: ${STUDENT_DOMAINS.join(', ')}`);
+                    setLoading(false);
+                    return;
+                }
+            } else if (role === 'Professor') {
+                if (!PROFESSOR_DOMAINS.includes(domain)) {
+                    setError(`Profesorii trebuie să folosească email din domeniile: ${PROFESSOR_DOMAINS.join(', ')}`);
+                    setLoading(false);
+                    return;
+                }
+            }
+        } catch (err) {
+            setError('Adresa de email nu este validă.');
+            setLoading(false);
+            return;
+        }
 
         try {
             const res = await api.post(`/users/register`, {

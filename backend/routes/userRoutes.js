@@ -1,3 +1,5 @@
+// Rute pentru user (register/login/etc)
+// o listă de endpoint-uri conectate la controller-e.
 import express from 'express';
 const router = express.Router();
 import {

@@ -1,3 +1,4 @@
+// un buton stilizat; folosit ca să trimitem un fel de rating rapid.
 import React from 'react';
 import { motion } from 'framer-motion';
 

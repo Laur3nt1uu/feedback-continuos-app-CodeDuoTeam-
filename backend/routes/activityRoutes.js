@@ -1,3 +1,5 @@
+// Rute pentru activități (creare, listare, etc.).
+// Le definim aici și le protejăm cu middleware când e nevoie.
 import express from 'express'; 
 const router = express.Router();
 

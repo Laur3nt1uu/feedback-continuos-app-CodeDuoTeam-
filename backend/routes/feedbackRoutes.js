@@ -1,3 +1,5 @@
+// Rute legate de feedback și join la activități.
+// primesc request-uri și dau mai departe la controller.
 import express from 'express';
 const router = express.Router();
 

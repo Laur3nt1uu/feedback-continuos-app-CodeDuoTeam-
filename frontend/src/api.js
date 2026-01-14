@@ -1,3 +1,5 @@
+// Mic helper care construiește URL-ul pentru API și configurează axios.
+// Îl folosim peste tot ca să nu scriem baseURL manual în componente.
 import axios from 'axios';
 
 const addApiSuffix = (url) => {

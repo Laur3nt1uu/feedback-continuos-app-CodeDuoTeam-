@@ -1,3 +1,5 @@
+// Componentă mică pentru mesaje tip toast (notificări pe ecran).
+// aratasucces/eroare fără să "sparga" pagina cu popup-uri urâte.
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import '../styles/Toast.css';

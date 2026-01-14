@@ -1,3 +1,5 @@
+//Controller pentru activități — creez, listez și administrez activități.
+// Majoritatea funcțiilor sunt apelate din rute când profesorul vrea să gestioneze activitățile.
 import Activity from '../models/Activity.js';
 import User from '../models/User.js'; 
 import Feedback from '../models/Feedback.js'; 
@@ -18,7 +20,7 @@ const createActivity = async (req, res) => {
         const existingActive = await Activity.findOne({
             where: {
                 professorId: professorId,
-                endTime: null, // Nu a fost oprită manual
+                endTime: null, 
                 [Op.and]: [
                     literal(`"startTime" + ("durationMinutes" * interval '1 minute') > NOW()`)
                 ]
@@ -66,7 +68,7 @@ const getActiveActivity = async (req, res) => {
         const activity = await Activity.findOne({
             where: {
                 professorId: professorId,
-                endTime: null, // Nu a fost oprită manual
+                endTime: null, 
                 [Op.and]: [
                     literal(`"startTime" + ("durationMinutes" * interval '1 minute') > NOW()`)
                 ]

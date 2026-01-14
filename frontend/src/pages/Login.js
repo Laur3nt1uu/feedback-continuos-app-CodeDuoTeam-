@@ -1,3 +1,5 @@
+//  Pagina de login — te autentifici ca să folosești aplicația.
+// Are formularul și logica de apel către backend,
 import React, { useState } from 'react';
 import api from '../api';
 import { useNavigate, Link, useParams } from 'react-router-dom';

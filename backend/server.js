@@ -1,3 +1,5 @@
+// Serverul pornește Express și leagă modelele la DB, ca să meargă API-ul.
+// E entrypoint-ul backend-ului
 import express from 'express'; 
 import cors from 'cors';
 import dotenv from 'dotenv'; 

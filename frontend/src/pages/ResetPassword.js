@@ -1,3 +1,4 @@
+//  se ocupă de resetarea parolei — primești link și îți pui parolă nouă.
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useParams, useNavigate, Link } from 'react-router-dom';

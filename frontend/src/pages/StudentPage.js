@@ -1,3 +1,4 @@
+//  Pagina pentru studenti — afișează emoticoane și trimite feedback rapid.
 import React, { useState } from 'react';
 import api from '../api';
 import { motion, AnimatePresence } from 'framer-motion';

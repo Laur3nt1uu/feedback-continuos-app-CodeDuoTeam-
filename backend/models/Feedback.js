@@ -1,3 +1,4 @@
+// — aici e structura tabelului pentru feedback-uri.
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../config/db.js';
 

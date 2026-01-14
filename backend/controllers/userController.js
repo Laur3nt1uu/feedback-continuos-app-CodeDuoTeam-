@@ -1,3 +1,5 @@
+// Controller pentru useri — login, register, resetare parolă etc.
+// E locul unde tratez request-urile legate de conturi și apelez modelul User.
 import User from '../models/User.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -41,22 +43,14 @@ const registerUser = async (req, res) => {
         return;
     }
 
+
     const STUDENT_DOMAINS = [
-        '@stud.ase.ro',        
-        '@student.ase.ro',      
-        '@student.upt.ro',      
-        '@student.utcluj.ro',  
-        '@stud.ubbcluj.ro',     
-        '@student.upb.ro',      
+        '@stud.ase.ro'
     ];
 
     const PROFESSOR_DOMAINS = [
-        '@ase.ro',              
-        '@ie.ase.ro',           
-        '@upt.ro',             
-        '@utcluj.ro',           
-        '@ubbcluj.ro',          
-        '@upb.ro',        
+        '@csie.ase.ro',
+         '@ie.ase.ro'
     ];
 
     const domain = email.substring(email.lastIndexOf('@')).toLowerCase();

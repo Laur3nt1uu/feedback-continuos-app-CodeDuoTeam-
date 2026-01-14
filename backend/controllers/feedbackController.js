@@ -1,7 +1,9 @@
+// Controller pentru feedback — aici se scrie logica când se primește feedback.
+// Conține funcții care citesc/scriu feedback în DB
 import Activity from '../models/Activity.js';
 import Feedback from '../models/Feedback.js';
 import { Op } from 'sequelize'; 
-
+ 
 
 
 const checkExpiry = (activity) => {

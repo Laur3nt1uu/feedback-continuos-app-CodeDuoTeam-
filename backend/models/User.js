@@ -1,23 +1,17 @@
+// aici definim structura tabelului de users.
+// Conține câmpurile și validările pentru email/parolă/rol
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../config/db.js'; 
 
+
 const STUDENT_EMAIL_DOMAINS = [
-    '@stud.ase.ro',         
-    '@student.ase.ro',      
-    '@student.upt.ro',      
-    '@student.utcluj.ro',  
-    '@stud.ubbcluj.ro',     
-    '@student.upb.ro',      
+    '@stud.ase.ro'
 ];
 
 const PROFESSOR_EMAIL_DOMAINS = [
-    '@ase.ro',              
-    '@ie.ase.ro',           
-    '@upt.ro',              
-    '@utcluj.ro',          
-    '@ubbcluj.ro',          
-    '@upb.ro',              
-];
+    '@csie.ase.ro',
+     '@ie.ase.ro'
+    ];
 
 const User = sequelize.define('User', {
     id: {

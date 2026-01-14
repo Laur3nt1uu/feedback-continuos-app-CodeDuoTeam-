@@ -1,24 +1,22 @@
+//  Config pentru DB — pun variabila de conexiune și inițializez Sequelize.
 import "dotenv/config";
 import { Sequelize } from 'sequelize';
 
 let sequelize;
 
-// Render și alte platforme cloud setează DATABASE_URL
 if (process.env.DATABASE_URL) {
-  // Conexiune cu DATABASE_URL (pentru producție/Render)
   sequelize = new Sequelize(process.env.DATABASE_URL, {
     dialect: 'postgres',
     logging: false,
     dialectOptions: {
       ssl: {
         require: true,
-        rejectUnauthorized: false // Necesar pentru Render
+        rejectUnauthorized: false 
       }
     }
   });
   console.log('📡 Using DATABASE_URL for connection');
 } else {
-  // Conexiune cu variabile separate (pentru dezvoltare locală)
   const dbName = process.env.DB_NAME && process.env.DB_NAME.trim();
   const dbUser = process.env.DB_USER && process.env.DB_USER.trim();
   const dbPassword = typeof process.env.DB_PASSWORD === 'string' ? process.env.DB_PASSWORD.trim() : process.env.DB_PASSWORD;

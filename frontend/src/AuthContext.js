@@ -1,3 +1,5 @@
+// Context ca să păstrăm info despre user și sesiune în app.
+// Îl folosim ca să putem loga/out și să trecem datele prin componente fără props multe.
 import React, { createContext, useState, useContext } from 'react';
 
 
