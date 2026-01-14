@@ -1,63 +1,48 @@
-# Feedback Continuu - Aplicație Web
+# Feedback Continuu — Aplicație Web
 
-## 1. Descriere proiect
-Aceasta este o aplicație web pentru acordarea de feedback continuu la cursuri sau seminarii.  
+O aplicație simplă pentru colectarea de feedback (prin emoticoane) în timp real, folosită de profesori pentru a primi reacții anonime de la studenți în timpul cursurilor sau seminariilor.
 
-- Profesorul poate crea activități cu titlu, descriere și cod unic.  
-- Studentul poate introduce codul și trimite feedback prin emoji (😊, ☹️, 😮, 😕).  
-- Feedback-ul este anonim și vizibil live pe dashboard-ul profesorului.  
+## Cuprins
 
-Aplicația este formată din **backend Node.js** și **frontend React SPA**.  
+- [Ce face proiectul](#ce-face-proiectul)
+- [Tehnologii](#tehnologii)
+- [Structura proiectului](#structura-proiectului)
+- [Pornire rapidă](#pornire-rapidă)
+- [Variabile de mediu](#variabile-de-mediu)
+- [Endpoint-uri principale](#endpoint-uri-principale)
+- [Exemple API (curl)](#exemple-api-curl)
 
+## Ce face proiectul
 
----
+- Profesorul poate crea activități cu titlu, descriere și cod unic.
+- Studentul poate introduce codul activității și trimite feedback (😊, ☹️, 😮, 😕).
+- Feedback-ul este anonim și apare live în dashboard-ul profesorului.
 
-## 2. Tehnologii folosite
-- **Frontend:** React.js
-- **Backend:** Node.js 
-- **Baza de date:** PostgreSQL  
-- **Versionare:** Git 
-- **Deploy:** Render
+Aplicația este împărțită în două părți: backend (Node.js / Express) și frontend (React).
 
----
+## Tehnologii
 
-## 3. Specificații detaliate
-- Profesorul poate crea activități cu titlu, descriere și dată de începere și finalizare.  
-- Studentul introduce codul activității pentru a participa.  
-- Studentul poate trimite feedback prin emoji: happy, sad, surprised, confused.  
-- Feedback-ul este anonim și poate fi trimis de mai multe ori.  
-- Profesorul vede feedback-ul live în listă și grafic.  
-- Feedback-ul rămâne stocat și poate fi accesat și după terminarea activității.  
+- Frontend: React (hooks, Context)
+- Backend: Node.js + Express
+- Bază de date: PostgreSQL (folosit cu Sequelize)
+- Autentificare: JWT
+- Email: Nodemailer (opțional, pentru reset parole)
 
----
+## Structura proiectului (scurt)
 
-## 4. Structura proiectului
+```
+├── backend/         # API, modele, rute, middleware
+├── frontend/        # aplicație React
+└── README.md
+```
 
-✅ Funcționalități principale
+## Pornire rapidă
 
-🔐 Autentificare & Autorizare
-- Înregistrare și autentificare cu token JWT
-- Validarea domeniului de email pentru determinarea rolului (student/profesor)
-- Parole criptate cu bcrypt
-- Dashboard-uri separate pentru profesori și studenți
+Precondiții
 
-🗄️ Bază de date & Backend
-- PostgreSQL (Sequelize)
-- API RESTful: rute pentru utilizatori, activități și feedback
-- Validare input și gestionare erori
-
-💻 Frontend
-- React 18 cu hooks și Context API
-- Interfețe responsive pentru mobil și desktop
-- Comunicare cu API folosind Axios
-
-
-🚀 Pornire rapidă
-
-Cerințe
-- Node.js 18+
-- PostgreSQL 12+
-- npm sau yarn
+- Node.js (>= 14)
+- npm
+- PostgreSQL (sau folosește SQLite în configurație alternativă)
 
 1) Backend
 
@@ -65,18 +50,26 @@ Cerințe
 cd backend
 npm install
 ```
-Creeaza fisierul .env cu urmatoarea configuratie:
-```powershell
-# DB_NAME=feedback_continuous_dev
-# DB_USER=postgres
-# DB_PASSWORD=your-password
-# DB_HOST=localhost
-# DB_PORT=5432
-# JWT_SECRET=your-jwt-secret
-# FRONTEND_URL=http://localhost:3000
-# EMAIL_USER=your-email@gmail.com
-# EMAIL_PASSWORD=your-email-password
+
+Crează fișierul `.env` (sau copiază `.env.example`) și completează valorile necesare:
+
+```text
+# Exemplu (backend/.env)
+PORT=8080
+NODE_ENV=development
+JWT_SECRET=your_jwt_secret
+DB_NAME=feedback_continuous_dev
+DB_USER=postgres
+DB_PASSWORD=your-db-password
+DB_HOST=localhost
+DB_PORT=5432
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASSWORD=your-email-password
+FRONTEND_URL=http://localhost:3000
 ```
+
+Pornește serverul backend (nodemon recomandat pentru dezvoltare):
+
 ```powershell
 npm run dev
 ```
@@ -86,43 +79,65 @@ npm run dev
 ```powershell
 cd frontend
 npm install
-```
-Creeaza fisierul .env cu urmatoarea configuratie:
-```powershell
-#REACT_APP_BASE_URL=http://localhost:5000/api
-
-```
-
-```powershell
 npm start
 ```
 
-3) Acces
-- Frontend: http://localhost:3000
-- API Backend: http://localhost:5000
+Accesează aplicația front-end în browser la:
+
+- http://localhost:3000
+
+## Variabile de mediu importante
+
+- `JWT_SECRET` — secretul pentru semnarea token-urilor JWT
+- `DATABASE_URL` sau `DB_*` — conexiunea la baza de date
+- `EMAIL_USER`, `EMAIL_PASSWORD` — cont pentru trimitere email (opțional)
+
+## Endpoint-uri principale
+
+- `POST /api/users/register` — înregistrare
+- `POST /api/users/login` — autentificare
+- `POST /api/users/forgot-password` — solicitare reset parolă
+- `GET /api/users/reset-password/:token` — validare token
+- `POST /api/users/reset-password/:token` — reset parolă
+
+- `POST /api/activities` — creează activitate (Profesor)
+- `GET /api/activities/active` — preia activități active
+- `GET /api/activities/:id/feedback` — feedback pentru activitate
+
+- `POST /api/feedback/join` — alăturare la activitate folosind `uniqueCode`
+- `POST /api/feedback` — trimite feedback
+
+## Exemple API (curl)
+
+Register (exemplu):
+
+```bash
+curl -X POST http://localhost:8080/api/users/register \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Ana","email":"ana@stud.ase.ro","password":"secret","role":"Student"}'
+```
+
+Login (exemplu):
+
+```bash
+curl -X POST http://localhost:8080/api/users/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"ana@stud.ase.ro","password":"secret"}'
+```
+
+## Testare manuală (scurt)
+
+1. Creează un cont profesor și unul student.
+2. Profesorul creează o activitate (setează start/end date).
+3. Studentul se alătură folosind codul activității și trimite feedback prin emoji.
+4. Profesorul verifică dashboard-ul live.
 
 
-� Endpoint-uri principale 
+---
 
-- Utilizatori
-	- POST /api/users/register — înregistrare
-	- POST /api/users/login — autentificare
-	- POST /api/users/forgot-password — solicitare reset parolă
-	- GET /api/users/reset-password/:token — validare token
-	- POST /api/users/reset-password/:token — reset parolă
+## Deployment
 
-- Activități 
-	- POST /api/activities — creează activitate 
-	- GET /api/activities/active — preia activitatea activă 
-	- GET /api/activities/:id/feedback — preia feedback-ul pentru o activitate
-
-- Feedback 
-	- POST /api/feedback/join — alăturare la activitate folosind `uniqueCode` 
-	- POST /api/feedback — trimite feedback 
-
-🚀 Deploy
-
-Aplicația este complet configurată si lansata folosind Render.
+Aplicația este deja deployată pe Render (backend + frontend). Setările folosite sunt în `render.yaml` 
 
 
 
