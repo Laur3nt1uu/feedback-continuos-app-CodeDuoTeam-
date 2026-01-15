@@ -1,6 +1,7 @@
 # Feedback Continuu — Aplicație Web
 
 O aplicație simplă pentru colectarea de feedback (prin emoticoane) în timp real, folosită de profesori pentru a primi reacții anonime de la studenți în timpul cursurilor sau seminariilor.
+Link deploy: https://feedback-continuos-app-codeduoteam-1.onrender.com/
 
 ## Cuprins
 
